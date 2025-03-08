@@ -1,0 +1,1 @@
+import{_ as e,o as t,e as s,E as c}from"./index-9fc5f980.js";const o={},n={class:"h-screen w-screen flex flex-col justify-center items-center"},r=c("h1",{class:"text-5xl"},"About page",-1),_=[r];function a(i,l){return t(),s("div",n,_)}const d=e(o,[["render",a]]);export{d as default};
