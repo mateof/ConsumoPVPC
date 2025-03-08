@@ -1,0 +1,8 @@
+version: '3.4'
+
+services:
+  consumopvpc:
+    image: consumopvpc
+    build:
+      context: .
+      dockerfile: ./Dockerfile
