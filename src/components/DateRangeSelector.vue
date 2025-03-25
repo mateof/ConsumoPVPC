@@ -24,13 +24,23 @@
         </v-btn>
       </v-col>
     </v-row>
+    <v-overlay :value="loading" style="z-index: 1001;">
+      <v-progress-circular
+      :size="70"
+      :width="7"
+      color="purple"
+      indeterminate
+    ></v-progress-circular>
+    </v-overlay>
   </v-container>
+  <div ref="gastoTotal"></div> 
 </template>
 
 <script lang="ts" setup>
 import { ref, computed } from 'vue';
 import { fetchPVPCData } from '../services/Esios';
 import { PvpcDataHelper } from '../models/PvpcData';
+import { getPvpcData } from '../services/DatabaseService';
 
 interface DataItem {
   fecha: string;
@@ -57,6 +67,8 @@ const availableDates = computed(() =>
 
 const startDate = ref<string | null>(null);
 const endDate = ref<string | null>(null);
+const loading = ref(true);
+const gastoTotal = ref<HTMLElement | null>(null);
 
 const availableEndDates = computed(() => {
   if (!startDate.value) return [];
@@ -97,6 +109,7 @@ const toUTC = (datetime: any) => {
 
 const fetchAndEmitData = async () => {
   if (startDate.value && endDate.value) {
+    loading.value = true;
     const start = new Date(startDate.value);
     const end = new Date(endDate.value);
     const dates = [];
@@ -109,14 +122,8 @@ const fetchAndEmitData = async () => {
 
     for (const date of dates) {
       try {
-        const pvpcData = await fetchPVPCData(date);
+        const pvpcData = await getPvpcData(date);
         const hourlyData = pvpcData.PVPC;
-        // const items = updatedData.filter((item: DataItem) => item.fecha.replace(/\//g, '-') === date && hourlyData.find((d: any) => parseFecha(d.Dia).includes(date) && parseInt(d.Hora.split('-')[1]) === parseInt(item.hora.split(':')[0])));
-                 
-        // items.forEach((item: DataItem) => {
-        //   item.precio_kwh = PvpcDataHelper.getPriceFromPvpcDataKwH(pvpcHourData);
-        //   item.gasto_total = (parseFloat(item.consumo_kWh.replace(',', '.')) * item.precio_kwh).toFixed(8);
-        // });
         updatedData.forEach((item: DataItem) => {
           if (item.fecha.replace(/\//g, '-') === date) {
             const hour = parseInt(item.hora.split(':')[0]);
@@ -133,6 +140,12 @@ const fetchAndEmitData = async () => {
     }
 
     emit('dateRangeSelected', updatedData);
+    loading.value = false;
+    if (gastoTotal.value) {
+      setTimeout(() => {
+        gastoTotal.value!.scrollIntoView({ behavior: 'smooth' });
+      }, 500);
+    }
   }
 };
 </script>

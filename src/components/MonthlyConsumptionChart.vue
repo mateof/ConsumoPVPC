@@ -37,6 +37,7 @@ import {
   LinearScale,
   PointElement,
 } from 'chart.js';
+import { chartColors } from '@/config/chartColors';
 
 ChartJS.register(
   Title,
@@ -85,7 +86,7 @@ const chartData = computed(() => {
     } else if (dayOfWeek === 0) {
       return 'red'; // Domingo
     } else {
-      return '#f87979'; // Otros días
+      return chartColors.value.backgroundColor; // Otros días
     }
   });
 
@@ -94,8 +95,8 @@ const chartData = computed(() => {
     datasets: [
       {
         label: 'Consumo (kWh)',
-        backgroundColor: '#f87979',
-        borderColor: '#f87979',
+        backgroundColor: chartColors.value.backgroundColor,
+        borderColor: chartColors.value.borderColor,
         fill: false,
         data: sortedDays.map(day => groupedData[day]),
         pointBackgroundColor: pointBackgroundColors,

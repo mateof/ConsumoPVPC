@@ -19,7 +19,7 @@ import * as directives from 'vuetify/directives';
 import '@mdi/font/css/materialdesignicons.css'; // Ensure you are using css-loader
 
 const myCustomLightTheme: ThemeDefinition = {
-	dark: true,
+	dark: false,
 	colors: {
 		primary: '#33627f',
 		secondary: '#34997e',

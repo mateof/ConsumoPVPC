@@ -62,29 +62,23 @@ const days = computed(() => [...new Set((props.data as DataItem[]).map((item: Da
 interface DataItem {
   fecha: string;
   hora: string;
-  consumo_kWh: string;
+  gasto_total: number;
   metodoObtencion: string;
 }
 
 const chartData = computed(() => {
   const dayData = (props.data as DataItem[]).filter((item: DataItem) => item.fecha === selectedDay.value);
   const sortedDayData = dayData.sort((a, b) => a.hora.localeCompare(b.hora));
-
-  const pointBackgroundColors = sortedDayData.map(item =>
-    item.metodoObtencion === 'Real' ? chartColors.value.backgroundColor : 'blue'
-  );
-
-  let data = {
+  let data =  {
     labels: sortedDayData.map(item => item.hora),
     datasets: [
       {
-        label: 'Consumo (kWh)',
-        backgroundColor: pointBackgroundColors,
+        label: 'Gasto Total (€)',
+        backgroundColor: chartColors.value.backgroundColor,
         borderColor: chartColors.value.borderColor,
         fill: false,
-        data: sortedDayData.map(item => parseFloat(item.consumo_kWh.replace(',', '.'))),
-        metodo: sortedDayData.map(item => item.metodoObtencion),
-        pointBackgroundColor: pointBackgroundColors, // Personaliza el color de los puntos
+        data: sortedDayData.map(item => item.gasto_total),
+        metodo: sortedDayData.map(item => item.metodoObtencion)
       },
     ],
   };
@@ -104,35 +98,35 @@ const chartOptions = ref({
     y: {
       title: {
         display: true,
-        text: 'Consumo (kWh)',
+        text: 'Gasto Total (€)',
       },
     },
   },
-  plugins: {
+plugins: {
     legend: {
-      display: true,
-      position: 'top' as const,
+        display: true,
+        position: 'top' as const,
     },
     tooltip: {
-      callbacks: {
-        label: function (tooltipItem: any) {
-          const label = tooltipItem.dataset.label || '';
-          const value = tooltipItem.raw;
-          const metodoObtencion = tooltipItem.dataset.metodo[tooltipItem.dataIndex];
-          return `${label}: ${value} kWh (Método: ${metodoObtencion})`;
+        callbacks: {
+            label: function(tooltipItem: any) {
+                const label = tooltipItem.dataset.label || '';
+                const value = tooltipItem.raw;
+                const metodoObtencion = tooltipItem.dataset.metodo[tooltipItem.dataIndex];
+                return `${label}: ${value} € (Método: ${metodoObtencion})`;
+            },
         },
-      },
     },
   },
-  layout: {
-    padding: {
-      left: 0,
-      right: 0,
-      top: 0,
-      bottom: 0,
-    },
+layout: {
+  padding: {
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
   },
-  backgroundColor: 'white',
+},
+backgroundColor: 'white',
 });
 
 const increaseDay = () => {

@@ -62,34 +62,51 @@ const months = computed(() => [...new Set((props.data as DataItem[]).map((item: 
 interface DataItem {
   fecha: string;
   hora: string;
-  consumo_kWh: string;
+  gasto_total: number;
+  metodoObtencion: string;
 }
 
 const chartData = computed(() => {
   const monthData = (props.data as DataItem[]).filter((item: DataItem) => item.fecha.slice(0, 7) === selectedMonth.value);
-  const groupedData = monthData.reduce((acc, item) => {
-    const hour = item.hora;
-    if (!acc[hour]) {
-      acc[hour] = 0;
+  const dailyGasto = monthData.reduce((acc: { [key: string]: number }, item: DataItem) => {
+    const day = item.fecha.slice(8, 10);
+    if (!acc[day]) {
+      acc[day] = 0;
     }
-    acc[hour] += parseFloat(item.consumo_kWh.replace(',', '.'));
+    acc[day] += item.gasto_total;
     return acc;
-  }, {} as Record<string, number>);
+  }, {});
 
-  const sortedHours = Object.keys(groupedData).sort((a, b) => parseInt(a) - parseInt(b));
+//   const sortedDailyGasto = Object.keys(dailyGasto).sort().map(date => ({
+//     fecha: date,
+//     gasto_total: dailyGasto[date],
+//   }));
+  const sortedDailyGasto = Object.keys(dailyGasto).sort((a, b) => parseInt(a) - parseInt(b));
 
-  return {
-    labels: sortedHours,
+  const pointBackgroundColors = sortedDailyGasto.map(day => {
+    const date = new Date(`${selectedMonth.value}-${day}`);
+    const dayOfWeek = date.getDay();
+    if (dayOfWeek === 6) {
+      return 'blue'; // Sábado
+    } else if (dayOfWeek === 0) {
+      return 'red'; // Domingo
+    } else {
+      return '#f87979'; // Otros días
+    }
+  });
+  let data =  {
+    labels: sortedDailyGasto,
     datasets: [
       {
-        label: 'Consumo (kWh)',
+        label: 'Gasto Total (€)',
         backgroundColor: chartColors.value.backgroundColor,
         borderColor: chartColors.value.borderColor,
         fill: false,
-        data: sortedHours.map(hour => groupedData[hour]),
+        data: sortedDailyGasto.map(day => dailyGasto[day]),
       },
     ],
   };
+  return data;
 });
 
 const chartOptions = ref({
@@ -99,13 +116,30 @@ const chartOptions = ref({
     x: {
       title: {
         display: true,
-        text: 'Hora',
+        text: 'Día del Mes',
+      },
+      ticks: {
+        color: (c: { tick: { label: string } }) => {
+          const day = parseInt(c.tick.label);
+          const date = new Date(`${selectedMonth.value}-${day}`);
+          const dayOfWeek = date.getDay();
+          if (dayOfWeek === 6) {
+            return "blue"; // Azul para sábado
+          } else if (dayOfWeek === 0) {
+            return "red"; // Rojo para domingo
+          } else {
+            return 'grey'; // Otros días
+          }
+        },
+        autoSkip: false,
+        maxRotation: 0,
+        minRotation: 0,
       },
     },
     y: {
       title: {
         display: true,
-        text: 'Consumo (kWh)',
+        text: 'Gasto Total (€)',
       },
     },
   },
@@ -113,6 +147,15 @@ const chartOptions = ref({
     legend: {
       display: true,
       position: 'top' as const,
+    },
+    tooltip: {
+      callbacks: {
+        label: function(tooltipItem: any) {
+          const label = tooltipItem.dataset.label || '';
+          const value = tooltipItem.raw;
+          return `${label}: ${value} €`;
+        },
+      },
     },
   },
   layout: {
@@ -153,6 +196,5 @@ watch((): DataItem[] => props.data as DataItem[], (newData: DataItem[]) => {
   margin: auto;
   height: 40vh;
   width: 80vw;
-  background-color: white;
 }
 </style>

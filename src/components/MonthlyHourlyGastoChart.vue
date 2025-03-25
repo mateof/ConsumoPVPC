@@ -2,16 +2,16 @@
   <v-container>
     <v-row>
       <v-col cols="12" md="4" class="d-flex align-center">
-        <v-btn icon @click="decreaseDay">
+        <v-btn icon @click="decreaseMonth">
           <v-icon>mdi-chevron-left</v-icon>
         </v-btn>
         <v-select
-          v-model="selectedDay"
-          :items="days"
-          label="Select Day"
+          v-model="selectedMonth"
+          :items="months"
+          label="Select Month"
           class="mx-2"
         ></v-select>
-        <v-btn icon @click="increaseDay">
+        <v-btn icon @click="increaseMonth">
           <v-icon>mdi-chevron-right</v-icon>
         </v-btn>
       </v-col>
@@ -39,6 +39,7 @@ import {
 } from 'chart.js';
 import { chartColors } from '@/config/chartColors';
 
+
 ChartJS.register(
   Title,
   Tooltip,
@@ -56,39 +57,40 @@ const props = defineProps({
   },
 });
 
-const selectedDay = ref<string>((props.data as DataItem[]).length > 0 ? (props.data as DataItem[])[0].fecha : '');
-const days = computed(() => [...new Set((props.data as DataItem[]).map((item: DataItem) => item.fecha))]);
+const selectedMonth = ref<string>((props.data as DataItem[]).length > 0 ? (props.data as DataItem[])[0].fecha.slice(0, 7) : '');
+const months = computed(() => [...new Set((props.data as DataItem[]).map((item: DataItem) => item.fecha.slice(0, 7)))]);
 
 interface DataItem {
   fecha: string;
   hora: string;
-  consumo_kWh: string;
-  metodoObtencion: string;
+  gasto_total: number;
 }
 
 const chartData = computed(() => {
-  const dayData = (props.data as DataItem[]).filter((item: DataItem) => item.fecha === selectedDay.value);
-  const sortedDayData = dayData.sort((a, b) => a.hora.localeCompare(b.hora));
+  const monthData = (props.data as DataItem[]).filter((item: DataItem) => item.fecha.slice(0, 7) === selectedMonth.value);
+  const groupedData = monthData.reduce((acc, item) => {
+    const hour = item.hora;
+    if (!acc[hour]) {
+      acc[hour] = 0;
+    }
+    acc[hour] += item.gasto_total;
+    return acc;
+  }, {} as Record<string, number>);
 
-  const pointBackgroundColors = sortedDayData.map(item =>
-    item.metodoObtencion === 'Real' ? chartColors.value.backgroundColor : 'blue'
-  );
+  const sortedHours = Object.keys(groupedData).sort((a, b) => parseInt(a) - parseInt(b));
 
-  let data = {
-    labels: sortedDayData.map(item => item.hora),
+  return {
+    labels: sortedHours,
     datasets: [
       {
-        label: 'Consumo (kWh)',
-        backgroundColor: pointBackgroundColors,
+        label: 'Gasto Total (€)',
+        backgroundColor: chartColors.value.backgroundColor,
         borderColor: chartColors.value.borderColor,
         fill: false,
-        data: sortedDayData.map(item => parseFloat(item.consumo_kWh.replace(',', '.'))),
-        metodo: sortedDayData.map(item => item.metodoObtencion),
-        pointBackgroundColor: pointBackgroundColors, // Personaliza el color de los puntos
+        data: sortedHours.map(hour => groupedData[hour]),
       },
     ],
   };
-  return data;
 });
 
 const chartOptions = ref({
@@ -104,7 +106,7 @@ const chartOptions = ref({
     y: {
       title: {
         display: true,
-        text: 'Consumo (kWh)',
+        text: 'Gasto Total (€)',
       },
     },
   },
@@ -118,8 +120,7 @@ const chartOptions = ref({
         label: function (tooltipItem: any) {
           const label = tooltipItem.dataset.label || '';
           const value = tooltipItem.raw;
-          const metodoObtencion = tooltipItem.dataset.metodo[tooltipItem.dataIndex];
-          return `${label}: ${value} kWh (Método: ${metodoObtencion})`;
+          return `${label}: ${value} €`;
         },
       },
     },
@@ -135,23 +136,23 @@ const chartOptions = ref({
   backgroundColor: 'white',
 });
 
-const increaseDay = () => {
-  const currentIndex = days.value.indexOf(selectedDay.value);
+const increaseMonth = () => {
+  const currentIndex = months.value.indexOf(selectedMonth.value);
   if (currentIndex > 0) {
-    selectedDay.value = days.value[currentIndex - 1];
+    selectedMonth.value = months.value[currentIndex - 1];
   }
 };
 
-const decreaseDay = () => {
-  const currentIndex = days.value.indexOf(selectedDay.value);
-  if (currentIndex < days.value.length - 1) {
-    selectedDay.value = days.value[currentIndex + 1];
+const decreaseMonth = () => {
+  const currentIndex = months.value.indexOf(selectedMonth.value);
+  if (currentIndex < months.value.length - 1) {
+    selectedMonth.value = months.value[currentIndex + 1];
   }
 };
 
 watch((): DataItem[] => props.data as DataItem[], (newData: DataItem[]) => {
   if (newData.length > 0) {
-    selectedDay.value = newData[0].fecha;
+    selectedMonth.value = newData[0].fecha.slice(0, 7);
   }
 });
 </script>
@@ -162,5 +163,6 @@ watch((): DataItem[] => props.data as DataItem[], (newData: DataItem[]) => {
   margin: auto;
   height: 40vh;
   width: 80vw;
+  background-color: white;
 }
 </style>
