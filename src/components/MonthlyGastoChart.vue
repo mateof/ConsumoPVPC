@@ -63,6 +63,7 @@ interface DataItem {
   fecha: string;
   hora: string;
   gasto_total: number;
+  consumo_kWh: string;
   metodoObtencion: string;
 }
 
@@ -77,24 +78,18 @@ const chartData = computed(() => {
     return acc;
   }, {});
 
-//   const sortedDailyGasto = Object.keys(dailyGasto).sort().map(date => ({
-//     fecha: date,
-//     gasto_total: dailyGasto[date],
-//   }));
+  const dailyConsumo = monthData.reduce((acc: { [key: string]: number }, item: DataItem) => {
+    const day = item.fecha.slice(8, 10);
+    if (!acc[day]) {
+      acc[day] = 0;
+    }
+    acc[day] += parseFloat(item.consumo_kWh.replace(',', '.'));
+    return acc;
+  }, {});
+
   const sortedDailyGasto = Object.keys(dailyGasto).sort((a, b) => parseInt(a) - parseInt(b));
 
-  const pointBackgroundColors = sortedDailyGasto.map(day => {
-    const date = new Date(`${selectedMonth.value}-${day}`);
-    const dayOfWeek = date.getDay();
-    if (dayOfWeek === 6) {
-      return 'blue'; // Sábado
-    } else if (dayOfWeek === 0) {
-      return 'red'; // Domingo
-    } else {
-      return '#f87979'; // Otros días
-    }
-  });
-  let data =  {
+  return {
     labels: sortedDailyGasto,
     datasets: [
       {
@@ -103,10 +98,18 @@ const chartData = computed(() => {
         borderColor: chartColors.value.borderColor,
         fill: false,
         data: sortedDailyGasto.map(day => dailyGasto[day]),
+        yAxisID: 'y-left', // Asocia esta línea al eje Y izquierdo
+      },
+      {
+        label: 'Consumo (kWh)',
+        backgroundColor: '#ff9800',
+        borderColor: '#ff9800',
+        fill: false,
+        data: sortedDailyGasto.map(day => dailyConsumo[day]),
+        yAxisID: 'y-right', // Asocia esta línea al eje Y derecho
       },
     ],
   };
-  return data;
 });
 
 const chartOptions = ref({
@@ -118,28 +121,23 @@ const chartOptions = ref({
         display: true,
         text: 'Día del Mes',
       },
-      ticks: {
-        color: (c: { tick: { label: string } }) => {
-          const day = parseInt(c.tick.label);
-          const date = new Date(`${selectedMonth.value}-${day}`);
-          const dayOfWeek = date.getDay();
-          if (dayOfWeek === 6) {
-            return "blue"; // Azul para sábado
-          } else if (dayOfWeek === 0) {
-            return "red"; // Rojo para domingo
-          } else {
-            return 'grey'; // Otros días
-          }
-        },
-        autoSkip: false,
-        maxRotation: 0,
-        minRotation: 0,
-      },
     },
     y: {
+      yAxisID: 'y-left',
       title: {
         display: true,
         text: 'Gasto Total (€)',
+      },
+      position: 'left',
+    },
+    'y-right': {
+      title: {
+        display: true,
+        text: 'Consumo (kWh)',
+      },
+      position: 'right',
+      grid: {
+        drawOnChartArea: false, // Evita que las líneas de la cuadrícula se superpongan
       },
     },
   },
@@ -150,10 +148,10 @@ const chartOptions = ref({
     },
     tooltip: {
       callbacks: {
-        label: function(tooltipItem: any) {
+        label: function (tooltipItem: any) {
           const label = tooltipItem.dataset.label || '';
           const value = tooltipItem.raw;
-          return `${label}: ${value} €`;
+          return `${label}: ${value}`;
         },
       },
     },

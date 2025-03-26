@@ -39,7 +39,6 @@ import {
 } from 'chart.js';
 import { chartColors } from '@/config/chartColors';
 
-
 ChartJS.register(
   Title,
   Tooltip,
@@ -64,11 +63,12 @@ interface DataItem {
   fecha: string;
   hora: string;
   gasto_total: number;
+  consumo_kWh: string;
 }
 
 const chartData = computed(() => {
   const monthData = (props.data as DataItem[]).filter((item: DataItem) => item.fecha.slice(0, 7) === selectedMonth.value);
-  const groupedData = monthData.reduce((acc, item) => {
+  const groupedGasto = monthData.reduce((acc, item) => {
     const hour = item.hora;
     if (!acc[hour]) {
       acc[hour] = 0;
@@ -77,7 +77,16 @@ const chartData = computed(() => {
     return acc;
   }, {} as Record<string, number>);
 
-  const sortedHours = Object.keys(groupedData).sort((a, b) => parseInt(a) - parseInt(b));
+  const groupedConsumo = monthData.reduce((acc, item) => {
+    const hour = item.hora;
+    if (!acc[hour]) {
+      acc[hour] = 0;
+    }
+    acc[hour] += parseFloat(item.consumo_kWh.replace(',', '.'));
+    return acc;
+  }, {} as Record<string, number>);
+
+  const sortedHours = Object.keys(groupedGasto).sort((a, b) => parseInt(a) - parseInt(b));
 
   return {
     labels: sortedHours,
@@ -87,7 +96,16 @@ const chartData = computed(() => {
         backgroundColor: chartColors.value.backgroundColor,
         borderColor: chartColors.value.borderColor,
         fill: false,
-        data: sortedHours.map(hour => groupedData[hour]),
+        data: sortedHours.map(hour => groupedGasto[hour]),
+        yAxisID: 'y-left', // Asocia esta línea al eje Y izquierdo
+      },
+      {
+        label: 'Consumo (kWh)',
+        backgroundColor: '#ff9800',
+        borderColor: '#ff9800',
+        fill: false,
+        data: sortedHours.map(hour => groupedConsumo[hour]),
+        yAxisID: 'y-right', // Asocia esta línea al eje Y derecho
       },
     ],
   };
@@ -104,9 +122,21 @@ const chartOptions = ref({
       },
     },
     y: {
+      yAxisID: 'y-left',
       title: {
         display: true,
         text: 'Gasto Total (€)',
+      },
+      position: 'left',
+    },
+    'y-right': {
+      title: {
+        display: true,
+        text: 'Consumo (kWh)',
+      },
+      position: 'right',
+      grid: {
+        drawOnChartArea: false, // Evita que las líneas de la cuadrícula se superpongan
       },
     },
   },
@@ -120,7 +150,7 @@ const chartOptions = ref({
         label: function (tooltipItem: any) {
           const label = tooltipItem.dataset.label || '';
           const value = tooltipItem.raw;
-          return `${label}: ${value} €`;
+          return `${label}: ${value}`;
         },
       },
     },
