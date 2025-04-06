@@ -41,6 +41,10 @@ export class PvpcDataHelper {
     return parseSpanishNumber(data.PCB) / 1000;
   }
 
+  static getPriceFromPvpcDataKwHCeutaYMelilla(data: PvpcData): number {
+    return parseSpanishNumber(data.CYM) / 1000;
+  }
+
   static getHourRange(data: PvpcData): { start: number; end: number } {
     const [start, end] = data.Hora.split('-').map(Number);
     return { start, end };

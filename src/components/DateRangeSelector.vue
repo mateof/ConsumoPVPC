@@ -1,6 +1,20 @@
 <template>
   <v-container>
     <v-row>
+      <!-- Selector de región -->
+      <v-col cols="12" md="4">
+        <v-select
+          v-model="region"
+          :items="regionOptions"
+          :item-props="itemProps"
+          item-text="text"
+          item-value="value"
+          label="Región"
+          @update:model-value="updateRegion"
+        ></v-select>
+      </v-col>
+    </v-row>
+    <v-row>
       <v-col cols="12" md="4">
         <v-select
           v-model="startDate"
@@ -26,14 +40,14 @@
     </v-row>
     <v-overlay :value="loading" style="z-index: 1001;">
       <v-progress-circular
-      :size="70"
-      :width="7"
-      color="purple"
-      indeterminate
-    ></v-progress-circular>
+        :size="70"
+        :width="7"
+        color="purple"
+        indeterminate
+      ></v-progress-circular>
     </v-overlay>
   </v-container>
-  <div ref="gastoTotal"></div> 
+  <div ref="gastoTotal"></div>
 </template>
 
 <script lang="ts" setup>
@@ -58,16 +72,31 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['dateRangeSelected', 'startDateChanged', 'endDateChanged']);
+const emit = defineEmits(['dateRangeSelected', 'startDateChanged', 'endDateChanged', 'regionChanged']);
 
-const availableDates = computed(() => 
+// Opciones de región
+const regionOptions = [
+  { text: 'Península, Baleares y Canarias', value: 'PBC' },
+  { text: 'Ceuta y Melilla', value: 'CYM' },
+];
+
+function itemProps (item: { value: string; text: string }) {
+    return {
+      title: item.value,
+      subtitle: item.text,
+    }
+  }
+const region = ref<string>('PBC'); // Valor por defecto
+
+// Fechas disponibles
+const availableDates = computed(() =>
   [...new Set(props.data.map((item: DataItem) => item.fecha))]
     .sort((a, b) => b.localeCompare(a))
 );
 
 const startDate = ref<string | null>(null);
 const endDate = ref<string | null>(null);
-const loading = ref(true);
+const loading = ref(false);
 const gastoTotal = ref<HTMLElement | null>(null);
 
 const availableEndDates = computed(() => {
@@ -76,14 +105,20 @@ const availableEndDates = computed(() => {
     .sort((a, b) => b.localeCompare(a));
 });
 
+// Actualiza la región seleccionada
+const updateRegion = () => {
+  emit('regionChanged', region.value);
+};
+
+// Actualiza la fecha de inicio
 const updateStartDate = () => {
-  // Si la fecha final es menor que la inicial, la reseteamos
   if (endDate.value && startDate.value && endDate.value < startDate.value) {
     endDate.value = null;
   }
   emit('startDateChanged', startDate.value);
 };
 
+// Actualiza la fecha de fin
 const updateEndDate = () => {
   emit('endDateChanged', endDate.value);
 };
@@ -103,9 +138,9 @@ const toUTC = (datetime: any) => {
   }
 
   const getUTC = myDate.getTime();
-  const offset = myDate.getTimezoneOffset() * 60000; // It's in minutes so convert to ms
+  const offset = myDate.getTimezoneOffset() * 60000; // It's en minutos, así que se convierte a ms
   return getUTC - offset; // UTC - OFFSET
-}
+};
 
 const fetchAndEmitData = async () => {
   if (startDate.value && endDate.value) {

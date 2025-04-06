@@ -6,7 +6,7 @@
           <v-icon>mdi-chevron-left</v-icon>
         </v-btn>
         <v-select
-          v-model="selectedDay"
+          v-model="dailyGastoSelectedDay"
           :items="days"
           label="Select Day"
           class="mx-2"
@@ -25,8 +25,10 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import { Line } from 'vue-chartjs';
+import { dailyGastoSelectedDay$ } from '@/state/SharedState.ts'; // Importa el estado compartido
+import { Subscription } from 'rxjs';
 import {
   Chart as ChartJS,
   Title,
@@ -56,8 +58,44 @@ const props = defineProps({
   },
 });
 
-const selectedDay = ref<string>((props.data as DataItem[]).length > 0 ? (props.data as DataItem[])[0].fecha : '');
+const dailyGastoSelectedDay = ref<string | null>(null); // Estado local para sincronizar con el BehaviorSubject
 const days = computed(() => [...new Set((props.data as DataItem[]).map((item: DataItem) => item.fecha))]);
+
+// Suscripción al estado compartido
+let subscription: Subscription | null = null;
+onMounted(() => {
+  subscription = dailyGastoSelectedDay$.subscribe((day) => {
+    dailyGastoSelectedDay.value = day;
+  });
+
+  // Inicializa el valor si no está definido
+  if (!dailyGastoSelectedDay$.value && days.value.length > 0) {
+    dailyGastoSelectedDay$.next(days.value[0]);
+  }
+});
+
+onUnmounted(() => {
+  subscription?.unsubscribe();
+});
+
+// Actualiza el estado compartido cuando cambie dailyGastoSelectedDay
+watch(dailyGastoSelectedDay, (newDay) => {
+  dailyGastoSelectedDay$.next(newDay);
+});
+
+const increaseDay = () => {
+  const currentIndex = days.value.indexOf(dailyGastoSelectedDay.value!);
+  if (currentIndex > 0) {
+    dailyGastoSelectedDay$.next(days.value[currentIndex - 1]);
+  }
+};
+
+const decreaseDay = () => {
+  const currentIndex = days.value.indexOf(dailyGastoSelectedDay.value!);
+  if (currentIndex < days.value.length - 1) {
+    dailyGastoSelectedDay$.next(days.value[currentIndex + 1]);
+  }
+};
 
 interface DataItem {
   fecha: string;
@@ -68,7 +106,7 @@ interface DataItem {
 }
 
 const chartData = computed(() => {
-  const dayData = (props.data as DataItem[]).filter((item: DataItem) => item.fecha === selectedDay.value);
+  const dayData = (props.data as DataItem[]).filter((item: DataItem) => item.fecha === dailyGastoSelectedDay.value);
   const sortedDayData = dayData.sort((a, b) => a.hora.localeCompare(b.hora));
 
   return {
@@ -151,26 +189,6 @@ const chartOptions = ref({
     },
   },
   backgroundColor: 'white',
-});
-
-const increaseDay = () => {
-  const currentIndex = days.value.indexOf(selectedDay.value);
-  if (currentIndex > 0) {
-    selectedDay.value = days.value[currentIndex - 1];
-  }
-};
-
-const decreaseDay = () => {
-  const currentIndex = days.value.indexOf(selectedDay.value);
-  if (currentIndex < days.value.length - 1) {
-    selectedDay.value = days.value[currentIndex + 1];
-  }
-};
-
-watch((): DataItem[] => props.data as DataItem[], (newData: DataItem[]) => {
-  if (newData.length > 0) {
-    selectedDay.value = newData[0].fecha;
-  }
 });
 </script>
 

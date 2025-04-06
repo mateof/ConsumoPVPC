@@ -6,7 +6,7 @@
           <v-icon>mdi-chevron-left</v-icon>
         </v-btn>
         <v-select
-          v-model="selectedMonth"
+          v-model="monthlyHourlySelectedMonth"
           :items="months"
           label="Select Month"
           class="mx-2"
@@ -25,8 +25,10 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import { Line } from 'vue-chartjs';
+import { monthlyHourlySelectedMonth$ } from '@/state/SharedState.ts'; // Importa el estado compartido
+import { Subscription } from 'rxjs';
 import {
   Chart as ChartJS,
   Title,
@@ -56,8 +58,44 @@ const props = defineProps({
   },
 });
 
-const selectedMonth = ref<string>((props.data as DataItem[]).length > 0 ? (props.data as DataItem[])[0].fecha.slice(0, 7) : '');
+const monthlyHourlySelectedMonth = ref<string | null>(null); // Estado local para sincronizar con el BehaviorSubject
 const months = computed(() => [...new Set((props.data as DataItem[]).map((item: DataItem) => item.fecha.slice(0, 7)))]);
+
+// Suscripción al estado compartido
+let subscription: Subscription | null = null;
+onMounted(() => {
+  subscription = monthlyHourlySelectedMonth$.subscribe((month) => {
+    monthlyHourlySelectedMonth.value = month;
+  });
+
+  // Inicializa el valor si no está definido
+  if (!monthlyHourlySelectedMonth$.value && months.value.length > 0) {
+    monthlyHourlySelectedMonth$.next(months.value[0]);
+  }
+});
+
+onUnmounted(() => {
+  subscription?.unsubscribe();
+});
+
+// Actualiza el estado compartido cuando cambie monthlyHourlySelectedMonth
+watch(monthlyHourlySelectedMonth, (newMonth) => {
+  monthlyHourlySelectedMonth$.next(newMonth);
+});
+
+const increaseMonth = () => {
+  const currentIndex = months.value.indexOf(monthlyHourlySelectedMonth.value!);
+  if (currentIndex > 0) {
+    monthlyHourlySelectedMonth$.next(months.value[currentIndex - 1]);
+  }
+};
+
+const decreaseMonth = () => {
+  const currentIndex = months.value.indexOf(monthlyHourlySelectedMonth.value!);
+  if (currentIndex < months.value.length - 1) {
+    monthlyHourlySelectedMonth$.next(months.value[currentIndex + 1]);
+  }
+};
 
 interface DataItem {
   fecha: string;
@@ -66,7 +104,7 @@ interface DataItem {
 }
 
 const chartData = computed(() => {
-  const monthData = (props.data as DataItem[]).filter((item: DataItem) => item.fecha.slice(0, 7) === selectedMonth.value);
+  const monthData = (props.data as DataItem[]).filter((item: DataItem) => item.fecha.slice(0, 7) === monthlyHourlySelectedMonth.value);
   const groupedData = monthData.reduce((acc, item) => {
     const hour = item.hora;
     if (!acc[hour]) {
@@ -124,26 +162,6 @@ const chartOptions = ref({
     },
   },
   backgroundColor: 'white',
-});
-
-const increaseMonth = () => {
-  const currentIndex = months.value.indexOf(selectedMonth.value);
-  if (currentIndex > 0) {
-    selectedMonth.value = months.value[currentIndex - 1];
-  }
-};
-
-const decreaseMonth = () => {
-  const currentIndex = months.value.indexOf(selectedMonth.value);
-  if (currentIndex < months.value.length - 1) {
-    selectedMonth.value = months.value[currentIndex + 1];
-  }
-};
-
-watch((): DataItem[] => props.data as DataItem[], (newData: DataItem[]) => {
-  if (newData.length > 0) {
-    selectedMonth.value = newData[0].fecha.slice(0, 7);
-  }
 });
 </script>
 

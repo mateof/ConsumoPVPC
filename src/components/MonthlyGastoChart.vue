@@ -6,7 +6,7 @@
           <v-icon>mdi-chevron-left</v-icon>
         </v-btn>
         <v-select
-          v-model="selectedMonth"
+          v-model="monthlyGastoSelectedMonth"
           :items="months"
           label="Select Month"
           class="mx-2"
@@ -25,8 +25,10 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import { Line } from 'vue-chartjs';
+import { monthlyGastoSelectedMonth$ } from '@/state/SharedState.ts'; // Importa el estado compartido
+import { Subscription } from 'rxjs';
 import {
   Chart as ChartJS,
   Title,
@@ -56,8 +58,44 @@ const props = defineProps({
   },
 });
 
-const selectedMonth = ref<string>((props.data as DataItem[]).length > 0 ? (props.data as DataItem[])[0].fecha.slice(0, 7) : '');
+const monthlyGastoSelectedMonth = ref<string | null>(null); // Estado local para sincronizar con el BehaviorSubject
 const months = computed(() => [...new Set((props.data as DataItem[]).map((item: DataItem) => item.fecha.slice(0, 7)))]);
+
+// Suscripción al estado compartido
+let subscription: Subscription | null = null;
+onMounted(() => {
+  subscription = monthlyGastoSelectedMonth$.subscribe((month) => {
+    monthlyGastoSelectedMonth.value = month;
+  });
+
+  // Inicializa el valor si no está definido
+  if (!monthlyGastoSelectedMonth$.value && months.value.length > 0) {
+    monthlyGastoSelectedMonth$.next(months.value[0]);
+  }
+});
+
+onUnmounted(() => {
+  subscription?.unsubscribe();
+});
+
+// Actualiza el estado compartido cuando cambie monthlyGastoSelectedMonth
+watch(monthlyGastoSelectedMonth, (newMonth) => {
+  monthlyGastoSelectedMonth$.next(newMonth);
+});
+
+const increaseMonth = () => {
+  const currentIndex = months.value.indexOf(monthlyGastoSelectedMonth.value!);
+  if (currentIndex > 0) {
+    monthlyGastoSelectedMonth$.next(months.value[currentIndex - 1]);
+  }
+};
+
+const decreaseMonth = () => {
+  const currentIndex = months.value.indexOf(monthlyGastoSelectedMonth.value!);
+  if (currentIndex < months.value.length - 1) {
+    monthlyGastoSelectedMonth$.next(months.value[currentIndex + 1]);
+  }
+};
 
 interface DataItem {
   fecha: string;
@@ -68,7 +106,7 @@ interface DataItem {
 }
 
 const chartData = computed(() => {
-  const monthData = (props.data as DataItem[]).filter((item: DataItem) => item.fecha.slice(0, 7) === selectedMonth.value);
+  const monthData = (props.data as DataItem[]).filter((item: DataItem) => item.fecha.slice(0, 7) === monthlyGastoSelectedMonth.value);
   const dailyGasto = monthData.reduce((acc: { [key: string]: number }, item: DataItem) => {
     const day = item.fecha.slice(8, 10);
     if (!acc[day]) {
@@ -165,26 +203,6 @@ const chartOptions = ref({
     },
   },
   backgroundColor: 'white',
-});
-
-const increaseMonth = () => {
-  const currentIndex = months.value.indexOf(selectedMonth.value);
-  if (currentIndex > 0) {
-    selectedMonth.value = months.value[currentIndex - 1];
-  }
-};
-
-const decreaseMonth = () => {
-  const currentIndex = months.value.indexOf(selectedMonth.value);
-  if (currentIndex < months.value.length - 1) {
-    selectedMonth.value = months.value[currentIndex + 1];
-  }
-};
-
-watch((): DataItem[] => props.data as DataItem[], (newData: DataItem[]) => {
-  if (newData.length > 0) {
-    selectedMonth.value = newData[0].fecha.slice(0, 7);
-  }
 });
 </script>
 

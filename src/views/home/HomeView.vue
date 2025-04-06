@@ -2,17 +2,65 @@
   <!-- <TechStack :tech-list="techList" /> -->
   <JsonImporter @dataImported="handleDataImported" />
   <template v-if="consumptionData.length > 0">
-    <DailyConsumptionChart :data="consumptionData" />
-    <MonthlyConsumptionChart :data="consumptionData" />
-    <MonthlyHourlyConsumptionChart :data="consumptionData" />
+    <CardWithOffcanvas
+    title="Consumo Diario"
+    offcanvasTitle="Monthly Consumption"
+    :bodyComponent="DailyConsumptionChart"
+    :offcanvasComponent="DailyConsumptionSummary"
+    :footerComponent="DailyConsumptionSummary"
+    :data="consumptionData"
+    @footerAction="handleFooterAction"
+    />
+    <CardWithOffcanvas
+    title="Consumo mensual por día"
+    offcanvasTitle="Monthly Consumption"
+    :bodyComponent="MonthlyConsumptionChart"
+    :offcanvasComponent="DailyConsumptionSummary"
+    :footerComponent="MonthlyConsumptionSummary"
+    :data="consumptionData"
+    @footerAction="handleFooterAction"
+    />
+    <CardWithOffcanvas
+    title="Consumo mensual por hora"
+    offcanvasTitle="Monthly Consumption"
+    :bodyComponent="MonthlyHourlyConsumptionChart"
+    :offcanvasComponent="DailyConsumptionSummary"
+    :footerComponent="MonthlyHourlyConsumptionSummary"
+    :data="consumptionData"
+    @footerAction="handleFooterAction"
+    />
     <DateRangeSelector :data="consumptionData"
       @dateRangeSelected="handleDateRangeSelected" @startDateChanged="handleDataChanged"
       @endDateChanged="handleDataChanged" />
       <template v-if="selectedDateRange !== null">
         <TotalGasto :data="selectedDateRange" />
-        <DailyGastoChart :data="selectedDateRange" />
-        <MonthlyGastoChart :data="selectedDateRange" />
-        <MonthlyHourlyGastoChart :data="selectedDateRange" />
+        <CardWithOffcanvas
+          title="Gasto diario"
+          offcanvasTitle="Monthly Consumption"
+          :bodyComponent="DailyGastoChart"
+          :offcanvasComponent="DailyConsumptionSummary"
+          :footerComponent="DailyGastoSummary"
+          :data="selectedDateRange"
+          @footerAction="handleFooterAction"
+        />
+        <CardWithOffcanvas
+          title="Gasto mensual por día"
+          offcanvasTitle="Monthly Consumption"
+          :bodyComponent="MonthlyGastoChart"
+          :offcanvasComponent="DailyConsumptionSummary"
+          :footerComponent="MonthlyGastoSummary"
+          :data="selectedDateRange"
+          @footerAction="handleFooterAction"
+        />
+        <CardWithOffcanvas
+          title="Gasto mensual por hora"
+          offcanvasTitle="Monthly Consumption"
+          :bodyComponent="MonthlyHourlyGastoChart"
+          :offcanvasComponent="DailyConsumptionSummary"
+          :footerComponent="MonthlyHourlyGastoSummary"
+          :data="selectedDateRange"
+          @footerAction="handleFooterAction"
+        />
       </template>
   </template>
 </template>
@@ -28,6 +76,12 @@ import TotalGasto from '@/components/TotalGasto.vue';
 import DailyGastoChart from '@/components/DailyGastoChart.vue';
 import MonthlyGastoChart from '@/components/MonthlyGastoChart.vue';
 import MonthlyHourlyGastoChart from '@/components/MonthlyHourlyGastoChart.vue';
+import DailyConsumptionSummary from '@/components/summaries/DailyConsumptionSummary.vue';
+import MonthlyConsumptionSummary from '@/components/summaries/MonthlyConsumptionSummary.vue';
+import DailyGastoSummary from '@/components/summaries/DailyGastoSummary.vue';
+import MonthlyHourlyConsumptionSummary from '@/components/summaries/MonthlyHourlyConsumptionSummary.vue';
+import MonthlyGastoSummary from '@/components/summaries/MonthlyGastoSummary.vue';
+import MonthlyHourlyGastoSummary from '@/components/summaries/MonthlyHourlyGastoSummary.vue';
 
 
 const techList: Array<{
@@ -73,5 +127,9 @@ watch(chartColors, () => {
     chartRef.value.update(); // Fuerza la actualización del gráfico
   }
 });
+
+const handleFooterAction = () => {
+  console.log('Footer action triggered');
+};
 
 </script>

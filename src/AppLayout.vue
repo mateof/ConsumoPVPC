@@ -47,7 +47,7 @@ const selectedColor = ref('#ffffff'); // Default color
 .fab-container {
     position: fixed;
     bottom: 80px;
-    right: 20px;
+    /* right: 20px; */
     z-index: 1000;
 }
 </style>
