@@ -76,6 +76,19 @@ const filteredData = computed(() => {
   );
 });
 
+// Agrupa los datos por día y calcula el gasto total por día
+const groupedByDay = computed(() => {
+  const grouped: Record<string, number> = {};
+  filteredData.value.forEach((item) => {
+    const day = item.fecha.slice(8, 10); // Extrae el día del formato de fecha
+    if (!grouped[day]) {
+      grouped[day] = 0;
+    }
+    grouped[day] += item.gasto_total;
+  });
+  return grouped;
+});
+
 // Calcula el gasto total, máximo y mínimo
 const totalGasto = computed(() =>
   filteredData.value.reduce(
@@ -85,15 +98,11 @@ const totalGasto = computed(() =>
 );
 
 const maxGasto = computed(() =>
-  Math.max(
-    ...filteredData.value.map((item) => item.gasto_total)
-  ).toFixed(2)
+  Math.max(...Object.values(groupedByDay.value)).toFixed(2)
 );
 
 const minGasto = computed(() =>
-  Math.min(
-    ...filteredData.value.map((item) => item.gasto_total)
-  ).toFixed(2)
+  Math.min(...Object.values(groupedByDay.value)).toFixed(2)
 );
 
 // Interfaz para los datos

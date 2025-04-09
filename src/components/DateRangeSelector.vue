@@ -164,8 +164,8 @@ const fetchAndEmitData = async () => {
             const hour = parseInt(item.hora.split(':')[0]);
             const pvpcHourData = hourlyData.find((d: any) => parseFecha(d.Dia).includes(date) && parseInt(d.Hora.split('-')[1]) === hour);
             if (pvpcHourData) {
-              item.precio_kwh = PvpcDataHelper.getPriceFromPvpcDataKwH(pvpcHourData);
-              item.gasto_total = parseFloat((parseFloat(item.consumo_kWh.replace(',', '.')) * item.precio_kwh).toFixed(8));
+              item.precio_kwh = region.value === "PBC" ? PvpcDataHelper.getPriceFromPvpcDataKwH(pvpcHourData) : PvpcDataHelper.getPriceFromPvpcDataKwHCeutaYMelilla(pvpcHourData);
+              item.gasto_total = parseFloat((parseFloat(item.consumo_kWh.replace(',', '.')) * item.precio_kwh).toFixed(4));
             }
           }
         });

@@ -1,13 +1,19 @@
 <template>
   <v-card>
     <!-- Header -->
-    <v-card-title>
+    <v-card-title class="header">
       <span>{{ title }}</span>
-      <v-spacer></v-spacer>
-      <v-btn icon @click="toggleOffcanvas">
-        <v-icon>mdi-menu</v-icon>
-      </v-btn>
     </v-card-title>
+    <v-divider></v-divider> <!-- Línea debajo de la cabecera -->
+
+    <!-- Botón mdi-arrow-left-bold -->
+    <v-btn
+      icon
+      class="menu-button"
+      @click="toggleOffcanvas"
+    >
+      <v-icon>mdi-arrow-left-bold</v-icon>
+    </v-btn>
 
     <!-- Body -->
     <v-card-text>
@@ -22,7 +28,7 @@
     </v-card-actions>
 
     <!-- Offcanvas -->
-      <v-navigation-drawer
+    <v-navigation-drawer
       v-model="offcanvasOpen"
       location="right"
       width="100%"
@@ -41,7 +47,6 @@
         <component :is="offcanvasComponent" :data="data" />
       </v-container>
     </v-navigation-drawer>
-    
   </v-card>
 </template>
 
@@ -91,6 +96,19 @@ const onFooterAction = () => {
 <style scoped>
 .v-card {
   margin-bottom: 16px;
+  position: relative;
+}
+
+.header {
+  background-color: #f5f5f5; /* Fondo gris claro */
+}
+
+.menu-button {
+  position: absolute;
+  top: 50%; /* A media altura */
+  left: 16px; /* Alineado a la izquierda */
+  transform: translateY(-50%); /* Centra el botón verticalmente */
+  z-index: 1; /* Asegura que el botón esté encima del contenido */
 }
 
 ::v-deep(nav.v-navigation-drawer) {

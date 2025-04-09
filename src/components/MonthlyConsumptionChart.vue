@@ -103,6 +103,9 @@ interface DataItem {
   fecha: string;
   hora: string;
   consumo_kWh: string;
+  energiaVertida_kWh: string;
+  energiaGenerada_kWh: string;
+  energiaAutoconsumida_kWh: string;
 }
 
 const chartData = computed(() => {
@@ -110,11 +113,19 @@ const chartData = computed(() => {
   const groupedData = monthData.reduce((acc, item) => {
     const day = item.fecha.slice(8, 10);
     if (!acc[day]) {
-      acc[day] = 0;
+      acc[day] = {
+        consumo: 0,
+        energiaVertida: 0,
+        energiaGenerada: 0,
+        energiaAutoconsumida: 0,
+      };
     }
-    acc[day] += parseFloat(item.consumo_kWh.replace(',', '.'));
+    acc[day].consumo += parseFloat(item.consumo_kWh.replace(',', '.'));
+    acc[day].energiaVertida += parseFloat(item.energiaVertida_kWh.replace(',', '.'));
+    acc[day].energiaGenerada += parseFloat(item.energiaGenerada_kWh.replace(',', '.'));
+    acc[day].energiaAutoconsumida += parseFloat(item.energiaAutoconsumida_kWh.replace(',', '.'));
     return acc;
-  }, {} as Record<string, number>);
+  }, {} as Record<string, { consumo: number; energiaVertida: number; energiaGenerada: number; energiaAutoconsumida: number }>);
 
   const sortedDays = Object.keys(groupedData).sort((a, b) => parseInt(a) - parseInt(b));
 
@@ -138,8 +149,29 @@ const chartData = computed(() => {
         backgroundColor: chartColors.value.backgroundColor,
         borderColor: chartColors.value.borderColor,
         fill: false,
-        data: sortedDays.map(day => groupedData[day]),
+        data: sortedDays.map(day => groupedData[day].consumo),
         pointBackgroundColor: pointBackgroundColors,
+      },
+      {
+        label: 'Energía Vertida (kWh)',
+        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+        borderColor: 'rgba(255, 99, 132, 1)',
+        fill: false,
+        data: sortedDays.map(day => groupedData[day].energiaVertida),
+      },
+      {
+        label: 'Energía Generada (kWh)',
+        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+        borderColor: 'rgba(54, 162, 235, 1)',
+        fill: false,
+        data: sortedDays.map(day => groupedData[day].energiaGenerada),
+      },
+      {
+        label: 'Energía Autoconsumida (kWh)',
+        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+        borderColor: 'rgba(75, 192, 192, 1)',
+        fill: false,
+        data: sortedDays.map(day => groupedData[day].energiaAutoconsumida),
       },
     ],
   };
@@ -175,7 +207,7 @@ const chartOptions = ref({
     y: {
       title: {
         display: true,
-        text: 'Consumo (kWh)',
+        text: 'Energía (kWh)',
       },
     },
   },

@@ -76,6 +76,19 @@ const filteredData = computed(() => {
   );
 });
 
+// Agrupa los datos por hora y calcula el consumo total por hora
+const groupedByHour = computed(() => {
+  const grouped: Record<string, number> = {};
+  filteredData.value.forEach((item) => {
+    const hour = item.hora; // Usa la hora como clave
+    if (!grouped[hour]) {
+      grouped[hour] = 0;
+    }
+    grouped[hour] += parseFloat(item.consumo_kWh.replace(',', '.'));
+  });
+  return grouped;
+});
+
 // Calcula el consumo total, máximo y mínimo
 const totalConsumption = computed(() =>
   filteredData.value.reduce(
@@ -85,19 +98,11 @@ const totalConsumption = computed(() =>
 );
 
 const maxConsumption = computed(() =>
-  Math.max(
-    ...filteredData.value.map((item) =>
-      parseFloat(item.consumo_kWh.replace(',', '.'))
-    )
-  ).toFixed(2)
+  Math.max(...Object.values(groupedByHour.value)).toFixed(2)
 );
 
 const minConsumption = computed(() =>
-  Math.min(
-    ...filteredData.value.map((item) =>
-      parseFloat(item.consumo_kWh.replace(',', '.'))
-    )
-  ).toFixed(2)
+  Math.min(...Object.values(groupedByHour.value)).toFixed(2)
 );
 
 // Interfaz para los datos

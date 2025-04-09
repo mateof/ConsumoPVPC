@@ -101,6 +101,9 @@ interface DataItem {
   fecha: string;
   hora: string;
   consumo_kWh: string;
+  energiaVertida_kWh: string;
+  energiaGenerada_kWh: string;
+  energiaAutoconsumida_kWh: string;
   metodoObtencion: string;
 }
 
@@ -112,7 +115,7 @@ const chartData = computed(() => {
     item.metodoObtencion === 'Real' ? chartColors.value.backgroundColor : 'blue'
   );
 
-  let data = {
+  return {
     labels: sortedDayData.map(item => item.hora),
     datasets: [
       {
@@ -122,11 +125,31 @@ const chartData = computed(() => {
         fill: false,
         data: sortedDayData.map(item => parseFloat(item.consumo_kWh.replace(',', '.'))),
         metodo: sortedDayData.map(item => item.metodoObtencion),
-        pointBackgroundColor: pointBackgroundColors, // Personaliza el color de los puntos
+        pointBackgroundColor: pointBackgroundColors,
+      },
+      {
+        label: 'Energía Vertida (kWh)',
+        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+        borderColor: 'rgba(255, 99, 132, 1)',
+        fill: false,
+        data: sortedDayData.map(item => parseFloat(item.energiaVertida_kWh.replace(',', '.'))),
+      },
+      {
+        label: 'Energía Generada (kWh)',
+        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+        borderColor: 'rgba(54, 162, 235, 1)',
+        fill: false,
+        data: sortedDayData.map(item => parseFloat(item.energiaGenerada_kWh.replace(',', '.'))),
+      },
+      {
+        label: 'Energía Autoconsumida (kWh)',
+        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+        borderColor: 'rgba(75, 192, 192, 1)',
+        fill: false,
+        data: sortedDayData.map(item => parseFloat(item.energiaAutoconsumida_kWh.replace(',', '.'))),
       },
     ],
   };
-  return data;
 });
 
 const chartOptions = ref({
@@ -142,7 +165,7 @@ const chartOptions = ref({
     y: {
       title: {
         display: true,
-        text: 'Consumo (kWh)',
+        text: 'Energía (kWh)',
       },
     },
   },
@@ -156,8 +179,10 @@ const chartOptions = ref({
         label: function (tooltipItem: any) {
           const label = tooltipItem.dataset.label || '';
           const value = tooltipItem.raw;
-          const metodoObtencion = tooltipItem.dataset.metodo[tooltipItem.dataIndex];
-          return `${label}: ${value} kWh (Método: ${metodoObtencion})`;
+          const metodoObtencion = tooltipItem.dataset.metodo?.[tooltipItem.dataIndex];
+          return metodoObtencion
+            ? `${label}: ${value} kWh (Método: ${metodoObtencion})`
+            : `${label}: ${value} kWh`;
         },
       },
     },

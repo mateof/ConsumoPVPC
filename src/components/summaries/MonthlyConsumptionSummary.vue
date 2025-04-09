@@ -76,6 +76,19 @@ const filteredData = computed(() => {
   );
 });
 
+// Agrupa los datos por día y calcula el consumo total por día
+const groupedByDay = computed(() => {
+  const grouped: Record<string, number> = {};
+  filteredData.value.forEach((item) => {
+    const day = item.fecha.slice(8, 10); // Extrae el día del formato de fecha
+    if (!grouped[day]) {
+      grouped[day] = 0;
+    }
+    grouped[day] += parseFloat(item.consumo_kWh.replace(',', '.'));
+  });
+  return grouped;
+});
+
 // Calcula el consumo total, máximo y mínimo
 const totalConsumption = computed(() =>
   filteredData.value.reduce(
@@ -85,19 +98,11 @@ const totalConsumption = computed(() =>
 );
 
 const maxConsumption = computed(() =>
-  Math.max(
-    ...filteredData.value.map((item) =>
-      parseFloat(item.consumo_kWh.replace(',', '.'))
-    )
-  ).toFixed(2)
+  Math.max(...Object.values(groupedByDay.value)).toFixed(2)
 );
 
 const minConsumption = computed(() =>
-  Math.min(
-    ...filteredData.value.map((item) =>
-      parseFloat(item.consumo_kWh.replace(',', '.'))
-    )
-  ).toFixed(2)
+  Math.min(...Object.values(groupedByDay.value)).toFixed(2)
 );
 
 // Interfaz para los datos

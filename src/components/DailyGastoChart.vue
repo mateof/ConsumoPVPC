@@ -103,6 +103,7 @@ interface DataItem {
   gasto_total: number;
   consumo_kWh: string;
   metodoObtencion: string;
+  precio_kwh: number;
 }
 
 const chartData = computed(() => {
@@ -119,6 +120,14 @@ const chartData = computed(() => {
         fill: false,
         data: sortedDayData.map(item => item.gasto_total),
         metodo: sortedDayData.map(item => item.metodoObtencion),
+        precioKwh: sortedDayData.map(item => item.precio_kwh),
+        yAxisID: 'y-left', // Asocia esta línea al eje Y izquierdo
+      },{
+        label: 'Precio por kWh (€)',
+        backgroundColor: '#4caf50',
+        borderColor: '#4caf50',
+        fill: false,
+        data: sortedDayData.map(item => item.precio_kwh),
         yAxisID: 'y-left', // Asocia esta línea al eje Y izquierdo
       },
       {
@@ -129,6 +138,7 @@ const chartData = computed(() => {
         data: sortedDayData.map(item => parseFloat(item.consumo_kWh.replace(',', '.'))),
         yAxisID: 'y-right', // Asocia esta línea al eje Y derecho
       },
+      
     ],
   };
 });
@@ -147,7 +157,7 @@ const chartOptions = ref({
       yAxisID: 'y-left',
       title: {
         display: true,
-        text: 'Gasto Total (€)',
+        text: 'Gasto Total (€) / Precio por kWh (€)',
       },
       position: 'left',
     },
@@ -173,9 +183,10 @@ const chartOptions = ref({
           const label = tooltipItem.dataset.label || '';
           const value = tooltipItem.raw;
           const metodoObtencion = tooltipItem.dataset.metodo?.[tooltipItem.dataIndex];
-          return metodoObtencion
+          const precioKwh = tooltipItem.dataset.precioKwh?.[tooltipItem.dataIndex];
+          return (metodoObtencion
             ? `${label}: ${value} (Método: ${metodoObtencion})`
-            : `${label}: ${value}`;
+            : `${label}: ${value}`) + (precioKwh ? ` (Precio Kwh: ${precioKwh.toFixed(4)})` : '');
         },
       },
     },

@@ -76,6 +76,18 @@ const filteredData = computed(() => {
   );
 });
 
+// Agrupa los datos por hora y calcula el gasto total por hora
+const groupedByHour = computed(() => {
+  const grouped: Record<string, number> = {};
+  filteredData.value.forEach((item) => {
+    if (!grouped[item.hora]) {
+      grouped[item.hora] = 0;
+    }
+    grouped[item.hora] += item.gasto_total;
+  });
+  return grouped;
+});
+
 // Calcula el gasto total, máximo y mínimo
 const totalGasto = computed(() =>
   filteredData.value.reduce(
@@ -85,15 +97,11 @@ const totalGasto = computed(() =>
 );
 
 const maxGasto = computed(() =>
-  Math.max(
-    ...filteredData.value.map((item) => item.gasto_total)
-  ).toFixed(2)
+  Math.max(...Object.values(groupedByHour.value)).toFixed(2)
 );
 
 const minGasto = computed(() =>
-  Math.min(
-    ...filteredData.value.map((item) => item.gasto_total)
-  ).toFixed(2)
+  Math.min(...Object.values(groupedByHour.value)).toFixed(2)
 );
 
 // Interfaz para los datos
