@@ -1,5 +1,5 @@
 <template>
-  <v-card>
+  <v-card :class="customClass">
     <!-- Header -->
     <v-card-title class="header">
       <span>{{ title }}</span>
@@ -77,6 +77,10 @@ const props = defineProps({
   data: {
     type: Array,
     required: true,
+  },
+  customClass: {
+    type: String,
+    default: '',
   },
 });
 

@@ -181,7 +181,7 @@ const chartOptions = ref({
       callbacks: {
         label: function (tooltipItem: any) {
           const label = tooltipItem.dataset.label || '';
-          const value = tooltipItem.raw;
+          const value = tooltipItem.raw.toFixed(4);
           const metodoObtencion = tooltipItem.dataset.metodo?.[tooltipItem.dataIndex];
           const precioKwh = tooltipItem.dataset.precioKwh?.[tooltipItem.dataIndex];
           return (metodoObtencion

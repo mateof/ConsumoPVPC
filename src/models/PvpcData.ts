@@ -54,4 +54,9 @@ export class PvpcDataHelper {
     const [day, month, year] = data.Dia.split('/').map(Number);
     return new Date(year, month - 1, day);
   }
+
+  static englishToSpanishDate(date: String): string {
+    const [year, month, day] = date.split('/').map(Number);
+    return `${day}/${month}/${year}`;
+  }
 }

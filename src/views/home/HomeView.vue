@@ -1,72 +1,38 @@
 <template>
-  <!-- <TechStack :tech-list="techList" /> -->
   <JsonImporter @dataImported="handleDataImported" />
   <template v-if="consumptionData.length > 0">
-    <CardWithOffcanvas
-    title="Consumo Diario"
-    offcanvasTitle="Monthly Consumption"
-    :bodyComponent="DailyConsumptionChart"
-    :offcanvasComponent="DailyConsumptionSummary"
-    :footerComponent="DailyConsumptionSummary"
-    :data="consumptionData"
-    @footerAction="handleFooterAction"
-    />
-    <CardWithOffcanvas
-    title="Consumo mensual por día"
-    offcanvasTitle="Monthly Consumption"
-    :bodyComponent="MonthlyConsumptionChart"
-    :offcanvasComponent="DailyConsumptionSummary"
-    :footerComponent="MonthlyConsumptionSummary"
-    :data="consumptionData"
-    @footerAction="handleFooterAction"
-    />
-    <CardWithOffcanvas
-    title="Consumo mensual por hora"
-    offcanvasTitle="Monthly Consumption"
-    :bodyComponent="MonthlyHourlyConsumptionChart"
-    :offcanvasComponent="DailyConsumptionSummary"
-    :footerComponent="MonthlyHourlyConsumptionSummary"
-    :data="consumptionData"
-    @footerAction="handleFooterAction"
-    />
-    <DateRangeSelector :data="consumptionData"
-      @dateRangeSelected="handleDateRangeSelected" @startDateChanged="handleDataChanged"
-      @endDateChanged="handleDataChanged" />
+    <CardWithOffcanvas title="Consumo Diario" offcanvasTitle="Información sobre consumo diario"
+      :bodyComponent="DailyConsumptionChart" :offcanvasComponent="DailyConsumoInfo"
+      :footerComponent="DailyConsumptionSummary" :data="consumptionData" @footerAction="handleFooterAction" />
+    <CardWithOffcanvas title="Consumo mensual por día" offcanvasTitle="Información sobre consumo mensual por día"
+      :bodyComponent="MonthlyConsumptionChart" :offcanvasComponent="DailyConsumoInfo"
+      :footerComponent="MonthlyConsumptionSummary" :data="consumptionData" @footerAction="handleFooterAction" />
+    <CardWithOffcanvas title="Consumo mensual por hora" offcanvasTitle="Información sobre consumo mensual por hora"
+      :bodyComponent="MonthlyHourlyConsumptionChart" :offcanvasComponent="DailyConsumoInfo"
+      :footerComponent="MonthlyHourlyConsumptionSummary" :data="consumptionData" @footerAction="handleFooterAction" />
+    <div class="calculo-gasto-container">
+      <h2 class="calculo-gasto-title">Cálculo de Gasto</h2>
+      <DateRangeSelector :data="consumptionData" @dateRangeSelected="handleDateRangeSelected"
+        @startDateChanged="handleDataChanged" @endDateChanged="handleDataChanged" />
+
       <template v-if="selectedDateRange !== null">
         <TotalGasto :data="selectedDateRange" />
-        <CardWithOffcanvas
-          title="Gasto diario"
-          offcanvasTitle="Monthly Consumption"
-          :bodyComponent="DailyGastoChart"
-          :offcanvasComponent="DailyConsumptionSummary"
-          :footerComponent="DailyGastoSummary"
-          :data="selectedDateRange"
-          @footerAction="handleFooterAction"
-        />
-        <CardWithOffcanvas
-          title="Gasto mensual por día"
-          offcanvasTitle="Monthly Consumption"
-          :bodyComponent="MonthlyGastoChart"
-          :offcanvasComponent="DailyConsumptionSummary"
-          :footerComponent="MonthlyGastoSummary"
-          :data="selectedDateRange"
-          @footerAction="handleFooterAction"
-        />
-        <CardWithOffcanvas
-          title="Gasto mensual por hora"
-          offcanvasTitle="Monthly Consumption"
-          :bodyComponent="MonthlyHourlyGastoChart"
-          :offcanvasComponent="DailyConsumptionSummary"
-          :footerComponent="MonthlyHourlyGastoSummary"
-          :data="selectedDateRange"
-          @footerAction="handleFooterAction"
-        />
+        <CardWithOffcanvas title="Gasto diario" offcanvasTitle="Gasto diario por horas" :bodyComponent="DailyGastoChart"
+          :offcanvasComponent="DailyGastoInfo" :footerComponent="DailyGastoSummary" :data="selectedDateRange"
+          @footerAction="handleFooterAction" customClass="vcard-gasto" />
+        <CardWithOffcanvas title="Gasto mensual por día" customClass="vcard-gasto" offcanvasTitle="Gasto mensual"
+          :bodyComponent="MonthlyGastoChart" :offcanvasComponent="GastoMensualInfo"
+          :footerComponent="MonthlyGastoSummary" :data="selectedDateRange" @footerAction="handleFooterAction" />
+        <CardWithOffcanvas title="Gasto mensual por hora" customClass="vcard-gasto" offcanvasTitle="Gasto mensual por hora"
+          :bodyComponent="MonthlyHourlyGastoChart" :offcanvasComponent="GastoMensualInfo"
+          :footerComponent="MonthlyHourlyGastoSummary" :data="selectedDateRange" @footerAction="handleFooterAction" />
       </template>
+    </div>
   </template>
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { chartColors } from '@/config/chartColors';
 import JsonImporter from '@/components/JsonImporter.vue';
 import DailyConsumptionChart from '@/components/DailyConsumptionChart.vue';
@@ -82,28 +48,10 @@ import DailyGastoSummary from '@/components/summaries/DailyGastoSummary.vue';
 import MonthlyHourlyConsumptionSummary from '@/components/summaries/MonthlyHourlyConsumptionSummary.vue';
 import MonthlyGastoSummary from '@/components/summaries/MonthlyGastoSummary.vue';
 import MonthlyHourlyGastoSummary from '@/components/summaries/MonthlyHourlyGastoSummary.vue';
-
-
-const techList: Array<{
-  name: string;
-  path: string | null;
-}> = [
-    { name: 'ESLint', path: '/eslint.svg' },
-    { name: 'Prettier', path: '/prettier.svg' },
-    { name: 'Tailwind CSS', path: '/tailwind.svg' },
-    { name: 'SASS', path: '/sass.svg' },
-    { name: 'Vitest', path: '/vitest.svg' },
-    { name: 'Testing Library', path: '/testing-library.svg' },
-    { name: 'Pinia', path: '/pinia.svg' },
-    { name: 'Vue Query', path: '/vue-query.svg' },
-    { name: 'Husky 🐶', path: null },
-    { name: 'Vue Router', path: null },
-    { name: 'Auto imports: Components', path: null },
-    {
-      name: 'Auto imports: API from Vitest, Pinia, Vue and Vue Router',
-      path: null,
-    },
-  ];
+import DailyConsumoInfo from '@/components/info/DailyConsumoInfo.vue';
+import DailyGastoInfo from '@/components/info/DailyGastoInfo.vue';
+import GastoMensualInfo from '@/components/info/GastoMensualInfo.vue';
+import DateRangeSelector from '@/components/DateRangeSelector.vue';
 
 const consumptionData = ref([]);
 const selectedDateRange = ref(null);
@@ -114,7 +62,6 @@ const handleDataImported = (data: any) => {
 };
 const handleDateRangeSelected = (dateRange: any) => {
   selectedDateRange.value = dateRange;
-  // Handle the date range selection logic here
   console.log('Date range selected:', dateRange);
 };
 
@@ -124,12 +71,41 @@ const handleDataChanged = (date: any) => {
 
 watch(chartColors, () => {
   if (chartRef.value) {
-    chartRef.value.update(); // Fuerza la actualización del gráfico
+    chartRef.value.update();
   }
 });
 
 const handleFooterAction = () => {
   console.log('Footer action triggered');
 };
-
 </script>
+
+<style scoped>
+.calculo-gasto-container {
+  margin-top: 24px;
+  padding: 16px; /* Padding por defecto */
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
+
+.calculo-gasto-title {
+  margin-bottom: 16px;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #333;
+}
+
+/* Aplica padding del 2% en pantallas que no sean móviles */
+@media (min-width: 600px) {
+  .calculo-gasto-container {
+    margin-left: 2%;
+    margin-right: 2%;
+  }
+
+  .vcard-gasto {
+    margin-left: 5%;
+    margin-right: 5%;
+  }
+}
+</style>

@@ -6,5 +6,8 @@
 		<v-btn>
 			<router-link to="/about"> About </router-link>
 		</v-btn>
+		<v-btn>
+			<router-link to="/datadisData"> Datadis Data </router-link>
+		</v-btn>
 	</v-app-bar>
 </template>

@@ -55,12 +55,15 @@ import { ref, computed } from 'vue';
 import { fetchPVPCData } from '../services/Esios';
 import { PvpcDataHelper } from '../models/PvpcData';
 import { getPvpcData } from '../services/DatabaseService';
+import { showSpinner$, startDate$, endDate$, region$ } from '@/state/SharedState.ts';
+
 
 interface DataItem {
   fecha: string;
   hora: string;
   consumo_kWh: string;
   metodoObtencion: string;
+  metodoObtencionPrecio: string;
   precio_kwh?: number;
   gasto_total?: number;
 }
@@ -71,6 +74,7 @@ const props = defineProps({
     required: true,
   },
 });
+
 
 const emit = defineEmits(['dateRangeSelected', 'startDateChanged', 'endDateChanged', 'regionChanged']);
 
@@ -87,6 +91,10 @@ function itemProps (item: { value: string; text: string }) {
     }
   }
 const region = ref<string>('PBC'); // Valor por defecto
+
+onMounted(() => {
+  region$.next(region.value);
+});
 
 // Fechas disponibles
 const availableDates = computed(() =>
@@ -108,6 +116,7 @@ const availableEndDates = computed(() => {
 // Actualiza la región seleccionada
 const updateRegion = () => {
   emit('regionChanged', region.value);
+  region$.next(region.value);
 };
 
 // Actualiza la fecha de inicio
@@ -116,11 +125,13 @@ const updateStartDate = () => {
     endDate.value = null;
   }
   emit('startDateChanged', startDate.value);
+  startDate$.next(startDate.value);
 };
 
 // Actualiza la fecha de fin
 const updateEndDate = () => {
   emit('endDateChanged', endDate.value);
+  endDate$.next(endDate.value);
 };
 
 const parseFecha = (fecha: string): string => {
@@ -143,7 +154,9 @@ const toUTC = (datetime: any) => {
 };
 
 const fetchAndEmitData = async () => {
+  
   if (startDate.value && endDate.value) {
+    showSpinner$.next(true);
     loading.value = true;
     const start = new Date(startDate.value);
     const end = new Date(endDate.value);
@@ -159,10 +172,19 @@ const fetchAndEmitData = async () => {
       try {
         const pvpcData = await getPvpcData(date);
         const hourlyData = pvpcData.PVPC;
-        updatedData.forEach((item: DataItem) => {
+        let previousValue = 0;
+        updatedData.reverse().forEach((item: DataItem) => {
           if (item.fecha.replace(/\//g, '-') === date) {
             const hour = parseInt(item.hora.split(':')[0]);
-            const pvpcHourData = hourlyData.find((d: any) => parseFecha(d.Dia).includes(date) && parseInt(d.Hora.split('-')[1]) === hour);
+            let pvpcHourData = 
+              hourlyData.find((d: any) => parseFecha(d.Dia).includes(date) && parseInt(d.Hora.split('-')[1]) === hour)
+              ??  hourlyData.find((d: any) => parseFecha(d.Dia).includes(date) && parseInt(d.Hora.split('-')[0]) === hour);
+            item.metodoObtencionPrecio = pvpcHourData ? 'Real' : 'Ponderado';
+            if (!pvpcHourData) {
+              pvpcHourData = previousValue;
+              // pvpcHourData.Hora = `${(hour - 1).toString().padStart(2, '0')}-${hour.toString().padStart(2, '0')}`;
+            }
+            previousValue = pvpcHourData;
             if (pvpcHourData) {
               item.precio_kwh = region.value === "PBC" ? PvpcDataHelper.getPriceFromPvpcDataKwH(pvpcHourData) : PvpcDataHelper.getPriceFromPvpcDataKwHCeutaYMelilla(pvpcHourData);
               item.gasto_total = parseFloat((parseFloat(item.consumo_kWh.replace(',', '.')) * item.precio_kwh).toFixed(4));
@@ -176,6 +198,7 @@ const fetchAndEmitData = async () => {
 
     emit('dateRangeSelected', updatedData);
     loading.value = false;
+    showSpinner$.next(false);
     if (gastoTotal.value) {
       setTimeout(() => {
         gastoTotal.value!.scrollIntoView({ behavior: 'smooth' });

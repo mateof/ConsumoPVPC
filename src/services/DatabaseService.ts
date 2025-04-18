@@ -41,3 +41,32 @@ export const getPvpcData = async (date: string): Promise<any> => {
     throw error;
   }
 };
+
+export const getAllPvpcData = async (): Promise<PvpcData[]> => {
+  try {
+    return await db.pvpcData.toArray();
+  } catch (error) {
+    console.error('Error fetching all PVPC data:', error);
+    throw error;
+  }
+};
+
+export const clearPvpcData = async (): Promise<void> => {
+  try {
+    await db.pvpcData.clear();
+    console.log('Todos los datos de pvpcData han sido eliminados.');
+  } catch (error) {
+    console.error('Error al eliminar todos los datos de pvpcData:', error);
+    throw error;
+  }
+};
+
+export const deletePvpcDataByDate = async (date: string): Promise<void> => {
+  try {
+    const deleted = await db.pvpcData.delete(date);
+    console.log(`El dato con la fecha ${date} ha sido eliminado.`);
+  } catch (error) {
+    console.error(`Error al eliminar el dato con la fecha ${date}:`, error);
+    throw error;
+  }
+};

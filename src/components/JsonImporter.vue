@@ -1,22 +1,34 @@
 <template>
   <v-container>
-    <v-file-input
-      v-model="file"
-      label="Import DataDis JSON File"
-      accept=".json"
-      @change="importJson"
-    ></v-file-input>
-    <!-- <v-card v-if="jsonData">
-      <v-card-title>Imported Datadis JSON Data</v-card-title>
-      <v-card-text>
-        <pre>{{ jsonData }}</pre>
-      </v-card-text>
-    </v-card> -->
+    <v-row align="center" justify="space-between">
+      <!-- File Input -->
+      <v-col cols="8">
+        <v-file-input
+          v-model="file"
+          label="Import DataDis JSON File"
+          accept=".json"
+          @change="importJson"
+        ></v-file-input>
+      </v-col>
+
+      <!-- Button with Link -->
+      <v-col cols="4" class="text-right">
+        <v-btn
+          color="primary"
+          outlined
+          href="https://datadis.es/login"
+          target="_blank"
+        >
+          Ir a DataDis
+          <v-icon right>mdi-open-in-new</v-icon>
+        </v-btn>
+      </v-col>
+    </v-row>
   </v-container>
 </template>
 
 <script lang="ts" setup>
-import { ref, watch, defineEmits } from 'vue';
+import { ref, defineEmits } from 'vue';
 
 const file = ref<File[] | undefined>(undefined);
 const jsonData = ref<any>(null);
@@ -42,5 +54,8 @@ const importJson = ($event: Event) => {
 pre {
   white-space: pre-wrap;
   word-wrap: break-word;
+}
+.text-right {
+  text-align: right;
 }
 </style>

@@ -18,6 +18,12 @@ const routes: RouteRecordRaw[] = [
 				component: () =>
 					import(/* webpackChunkName: "home" */ '@/views/about/AboutView.vue'),
 			},
+			{
+				path: '/datadisData',
+				name: 'DatadisData',
+				component: () =>
+					import(/* webpackChunkName: "home" */ '@/views/data/DatadisData.vue'),
+			},
 		],
 	},
 ];

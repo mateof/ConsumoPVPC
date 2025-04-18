@@ -188,7 +188,7 @@ const chartOptions = ref({
       callbacks: {
         label: function (tooltipItem: any) {
           const label = tooltipItem.dataset.label || '';
-          const value = tooltipItem.raw;
+          const value = tooltipItem.raw.toFixed(4);
           return `${label}: ${value}`;
         },
       },
