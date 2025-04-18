@@ -2,7 +2,7 @@ import Dexie from 'dexie';
 import { fetchPVPCData } from './Esios';
 import { PvpcDataHelper } from '../models/PvpcData';
 
-interface PvpcData {
+export interface PvpcData {
   date: string;
   data: any;
 }

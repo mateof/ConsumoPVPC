@@ -40,6 +40,7 @@ import {
   PointElement,
 } from 'chart.js';
 import { chartColors } from '@/config/chartColors';
+import { PropType } from 'vue';
 
 ChartJS.register(
   Title,
@@ -51,7 +52,7 @@ ChartJS.register(
   PointElement
 );
 
-import { PropType } from 'vue';
+
 
 const props = defineProps({
   data: {

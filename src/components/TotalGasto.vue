@@ -1,7 +1,7 @@
 <template>
   
       <v-card class="vcard">
-        <v-card-title class="header">Resumen de la región 🗺 {{ region$.value }} desde <v-chip variant="outlined"> 🗓 {{ PvpcDataHelper.englishToSpanishDate(startDate$.value) }} </v-chip> hasta <v-chip variant="outlined"> 🗓 {{ PvpcDataHelper.englishToSpanishDate(endDate$.value) }}</v-chip></v-card-title>
+        <v-card-title class="header">Resumen de la región 🗺 {{ region$.value }} desde <v-chip variant="outlined"> 🗓 {{ PvpcDataHelper.englishToSpanishDate(startDate$.value ?? "") }} </v-chip> hasta <v-chip variant="outlined"> 🗓 {{ PvpcDataHelper.englishToSpanishDate(endDate$.value ?? "") }}</v-chip></v-card-title>
         <v-card-text class="card-body">
           <v-container>
           <v-row>

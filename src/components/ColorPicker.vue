@@ -5,13 +5,14 @@
 </template>
 
 <script lang="ts" setup>
+import { chartColors } from '@/config/chartColors';
+
 const props = defineProps({
     modelValue: {
         type: String,
         required: true,
     },
 });
-import { chartColors } from '@/config/chartColors';
 
 const emit = defineEmits(['update:modelValue']);
 

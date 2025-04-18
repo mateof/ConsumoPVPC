@@ -13,7 +13,7 @@
                         <v-icon>mdi-palette</v-icon>
                     </v-btn>
                     <v-dialog v-model="showColorPicker" persistent max-width="290">
-                        <template #activator="{ on, attrs }">
+                        <template>
                             <!-- FAB triggers the dialog -->
                         </template>
                         <v-card>

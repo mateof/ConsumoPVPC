@@ -33,6 +33,7 @@
 
 <script lang="ts" setup>
 import { ref, watch } from 'vue';
+import type { Ref } from 'vue';
 import { chartColors } from '@/config/chartColors';
 import JsonImporter from '@/components/JsonImporter.vue';
 import DailyConsumptionChart from '@/components/DailyConsumptionChart.vue';
@@ -55,7 +56,9 @@ import DateRangeSelector from '@/components/DateRangeSelector.vue';
 
 const consumptionData = ref([]);
 const selectedDateRange = ref(null);
-const chartRef = ref(null);
+
+
+const chartRef: Ref<{ update: () => void } | null> = ref(null);
 
 const handleDataImported = (data: any) => {
   consumptionData.value = data;
