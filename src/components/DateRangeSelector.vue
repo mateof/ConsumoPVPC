@@ -173,7 +173,7 @@ const fetchAndEmitData = async () => {
         const pvpcData = await getPvpcData(date);
         const hourlyData = pvpcData.PVPC;
         let previousValue = 0;
-        updatedData.reverse().forEach((item: DataItem) => {
+        updatedData.forEach((item: DataItem) => {
           if (item.fecha.replace(/\//g, '-') === date) {
             const hour = parseInt(item.hora.split(':')[0]);
             let pvpcHourData = 
