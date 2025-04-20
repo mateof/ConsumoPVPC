@@ -4,6 +4,3 @@ Analiza tu consumo y calcula el coste real de lo que consumes en un periodo dete
 
 [https://mateof.github.io/ConsumoPVPC/](https://mateof.github.io/ConsumoPVPC/)
 
-# Instrucciones
-
-[https://mateof.github.io/ConsumoPVPC/instructions](https://mateof.github.io/ConsumoPVPC/instructions)
