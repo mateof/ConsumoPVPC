@@ -26,13 +26,13 @@
 			<li>Accede a la página de <a href="https://datadis.es/login" target="_blank">DataDis</a> e inicia sesión con tus credenciales.</li>
 			<li>Selecciona el contrato del cual deseas obtener los datos.</li>
 			<p>En la sección "Mis Suministros", podrás ver una lista de tus contratos registrados.</p>
-			<img src="img/MisSuministros.png" alt="Mis Suministros"/>
+			<img src="/img/MisSuministros.png" alt="Mis Suministros"/>
 			<li>Selecciona tu contrato, pulsa en el botón <b>Preparar descarga</b> y selecciona el rango de fechas deseado.</li>
-			<div style="width: 50%; height: 50%;"><img src="img/PrepararLaDescarga.png" alt="Preparar descarga"/></div>
+			<div style="width: 50%; height: 50%;"><img src="/img/PrepararLaDescarga.png" alt="Preparar descarga"/></div>
 			
 			<li>Descarga el archivo en formato JSON.</li>
 			<p>Dirígete al centro de descargas, espera a que termine de procesas y descarga el fichero generado.</p>
-			<img src="img/CentroDeDescargas.png" alt="Centro de descargas"/>
+			<img src="/img/CentroDeDescargas.png" alt="Centro de descargas"/>
 			<li>Importa el fichero descargado en esta herramienta <a href="/">ConsumoPVPC</a>.</li>
 		</ol>
 		<v-divider :thickness="6"></v-divider>
