@@ -1,13 +1,13 @@
 <template>
 	<v-app-bar density="compact" color="primary" flat class="text-white px-10">
 		<v-btn data-testid="button">
-			<router-link to="/"> Home </router-link>
+			<router-link to="/"> Inicio </router-link>
 		</v-btn>
 		<v-btn>
-			<router-link to="/about"> About </router-link>
+			<router-link to="/instructions"> Instrucciones </router-link>
 		</v-btn>
 		<v-btn>
-			<router-link to="/datadisData"> Datadis Data </router-link>
+			<router-link to="/esiosData"> Datos de Esios </router-link>
 		</v-btn>
 	</v-app-bar>
 </template>

@@ -13,16 +13,16 @@ const routes: RouteRecordRaw[] = [
 					import(/* webpackChunkName: "home" */ '@/views/home/HomeView.vue'),
 			},
 			{
-				path: '/about',
-				name: 'About',
+				path: '/instructions',
+				name: 'Instrucciones',
 				component: () =>
-					import(/* webpackChunkName: "home" */ '@/views/about/AboutView.vue'),
+					import(/* webpackChunkName: "home" */ '@/views/instructions/InstructionsView.vue'),
 			},
 			{
-				path: '/datadisData',
-				name: 'DatadisData',
+				path: '/esiosData',
+				name: 'EsiosData',
 				component: () =>
-					import(/* webpackChunkName: "home" */ '@/views/data/DatadisData.vue'),
+					import(/* webpackChunkName: "home" */ '@/views/data/EsiosData.vue'),
 			},
 		],
 	},
