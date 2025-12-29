@@ -53,14 +53,6 @@ const vuetify = createVuetify({
     VBtn: {
       rounded: 'lg',
     },
-    VTextField: {
-      variant: 'outlined',
-      density: 'comfortable',
-    },
-    VSelect: {
-      variant: 'outlined',
-      density: 'comfortable',
-    },
   },
 });
 
