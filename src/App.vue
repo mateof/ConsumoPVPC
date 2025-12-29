@@ -33,7 +33,7 @@ let subscription: Subscription | null = null;
 
 // Suscripción al BehaviorSubject
 onMounted(() => {
-  subscription = showSpinner$.subscribe((value) => {
+  subscription = showSpinner$.subscribe((value: boolean | null) => {
     showSpinner.value = !!value; // Actualiza el estado local basado en el BehaviorSubject
   });
 });

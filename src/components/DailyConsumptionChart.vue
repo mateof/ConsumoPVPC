@@ -64,7 +64,7 @@ const days = computed(() => [...new Set((props.data as DataItem[]).map((item: Da
 // Suscríbete a los cambios en consumptionSelectedDay$
 let subscription: Subscription | null = null;
 onMounted(() => {
-  subscription = consumptionSelectedDay$.subscribe((day) => {
+  subscription = consumptionSelectedDay$.subscribe((day: string | null) => {
     consumptionSelectedDay.value = day;
   });
 

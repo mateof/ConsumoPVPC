@@ -55,7 +55,7 @@ const days = computed(() => [...new Set((props.data as DataItem[]).map((item: Da
 // Suscripción al estado compartido
 let subscription: Subscription | null = null;
 onMounted(() => {
-  subscription = consumptionSelectedDay$.subscribe((day) => {
+  subscription = consumptionSelectedDay$.subscribe((day: string | null) => {
     selectedDay.value = day;
   });
 

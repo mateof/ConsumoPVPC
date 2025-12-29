@@ -84,7 +84,7 @@ const regionOptions = [
   { text: 'Ceuta y Melilla', value: 'CYM' },
 ];
 
-function itemProps (item: { value: string; text: string }) {
+function itemProps (item: Record<string, any>) {
     return {
       title: item.value,
       subtitle: item.text,

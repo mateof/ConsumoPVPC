@@ -64,7 +64,7 @@ const months = computed(() => [...new Set((props.data as DataItem[]).map((item: 
 // Suscripción al estado compartido
 let subscription: Subscription | null = null;
 onMounted(() => {
-  subscription = monthlyHourlySelectedMonth$.subscribe((month) => {
+  subscription = monthlyHourlySelectedMonth$.subscribe((month: string | null) => {
     monthlyHourlySelectedMonth.value = month;
   });
 

@@ -61,7 +61,7 @@ import type { PvpcData } from '@/services/DatabaseService';
 
 const pvpcData = ref<PvpcData[]>([]);
 
-const groupBy = [{ key: 'date', order: 'desc' }]
+const groupBy = [{ key: 'date', order: 'desc' as const }]
 
 const headers = [
     { title: 'Fecha', text: 'Fecha', key: 'date' },
