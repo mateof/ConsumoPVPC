@@ -59,7 +59,10 @@ const props = defineProps({
 });
 
 const monthlyGastoSelectedMonth = ref<string | null>(null); // Estado local para sincronizar con el BehaviorSubject
-const months = computed(() => [...new Set((props.data as DataItem[]).map((item: DataItem) => item.fecha.slice(0, 7)))]);
+const months = computed(() => {
+  if (!props.data || !Array.isArray(props.data)) return [];
+  return [...new Set((props.data as DataItem[]).filter(item => item?.fecha).map((item: DataItem) => item.fecha.slice(0, 7)))];
+});
 
 // Suscripción al estado compartido
 let subscription: Subscription | null = null;
@@ -105,23 +108,34 @@ interface DataItem {
   metodoObtencion: string;
 }
 
+const parseNumber = (value: string | undefined): number => {
+  if (!value) return 0;
+  return parseFloat(value.replace(',', '.')) || 0;
+};
+
 const chartData = computed(() => {
-  const monthData = (props.data as DataItem[]).filter((item: DataItem) => item.fecha.slice(0, 7) === monthlyGastoSelectedMonth.value);
+  if (!props.data || !Array.isArray(props.data)) {
+    return { labels: [], datasets: [] };
+  }
+
+  const monthData = (props.data as DataItem[]).filter((item: DataItem) => item?.fecha?.slice(0, 7) === monthlyGastoSelectedMonth.value);
   const dailyGasto = monthData.reduce((acc: { [key: string]: number }, item: DataItem) => {
+    if (!item?.fecha) return acc;
     const day = item.fecha.slice(8, 10);
     if (!acc[day]) {
       acc[day] = 0;
     }
-    acc[day] += item.gasto_total;
+    acc[day] += item?.gasto_total || 0;
     return acc;
   }, {});
 
   const dailyConsumo = monthData.reduce((acc: { [key: string]: number }, item: DataItem) => {
+    if (!item?.fecha) return acc;
     const day = item.fecha.slice(8, 10);
     if (!acc[day]) {
       acc[day] = 0;
     }
-    acc[day] += parseFloat(item.consumo_kWh.replace(',', '.'));
+    acc[day] += parseNumber(item.consumo_kWh);
     return acc;
   }, {});
 

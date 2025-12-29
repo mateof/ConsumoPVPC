@@ -59,7 +59,10 @@ const props = defineProps({
 });
 
 const consumptionSelectedDay = ref<string | null>(null);
-const days = computed(() => [...new Set((props.data as DataItem[]).map((item: DataItem) => item.fecha))]);
+const days = computed(() => {
+  if (!props.data || !Array.isArray(props.data)) return [];
+  return [...new Set((props.data as DataItem[]).filter(item => item?.fecha).map((item: DataItem) => item.fecha))];
+});
 
 // Suscríbete a los cambios en consumptionSelectedDay$
 let subscription: Subscription | null = null;
@@ -107,24 +110,33 @@ interface DataItem {
   metodoObtencion: string;
 }
 
+const parseNumber = (value: string | undefined): number => {
+  if (!value) return 0;
+  return parseFloat(value.replace(',', '.')) || 0;
+};
+
 const chartData = computed(() => {
-  const dayData = (props.data as DataItem[]).filter((item: DataItem) => item.fecha === consumptionSelectedDay.value);
-  const sortedDayData = dayData.sort((a, b) => a.hora.localeCompare(b.hora));
+  if (!props.data || !Array.isArray(props.data)) {
+    return { labels: [], datasets: [] };
+  }
+
+  const dayData = (props.data as DataItem[]).filter((item: DataItem) => item?.fecha === consumptionSelectedDay.value);
+  const sortedDayData = dayData.sort((a, b) => (a?.hora || '').localeCompare(b?.hora || ''));
 
   const pointBackgroundColors = sortedDayData.map(item =>
-    item.metodoObtencion === 'Real' ? chartColors.value.backgroundColor : 'blue'
+    item?.metodoObtencion === 'Real' ? chartColors.value.backgroundColor : 'blue'
   );
 
   return {
-    labels: sortedDayData.map(item => item.hora),
+    labels: sortedDayData.map(item => item?.hora || ''),
     datasets: [
       {
         label: 'Consumo (kWh)',
         backgroundColor: pointBackgroundColors,
         borderColor: chartColors.value.borderColor,
         fill: false,
-        data: sortedDayData.map(item => parseFloat(item.consumo_kWh.replace(',', '.'))),
-        metodo: sortedDayData.map(item => item.metodoObtencion),
+        data: sortedDayData.map(item => parseNumber(item?.consumo_kWh)),
+        metodo: sortedDayData.map(item => item?.metodoObtencion || ''),
         pointBackgroundColor: pointBackgroundColors,
       },
       {
@@ -132,21 +144,21 @@ const chartData = computed(() => {
         backgroundColor: 'rgba(255, 99, 132, 0.2)',
         borderColor: 'rgba(255, 99, 132, 1)',
         fill: false,
-        data: sortedDayData.map(item => parseFloat(item.energiaVertida_kWh.replace(',', '.'))),
+        data: sortedDayData.map(item => parseNumber(item?.energiaVertida_kWh)),
       },
       {
         label: 'Energía Generada (kWh)',
         backgroundColor: 'rgba(54, 162, 235, 0.2)',
         borderColor: 'rgba(54, 162, 235, 1)',
         fill: false,
-        data: sortedDayData.map(item => parseFloat(item.energiaGenerada_kWh.replace(',', '.'))),
+        data: sortedDayData.map(item => parseNumber(item?.energiaGenerada_kWh)),
       },
       {
         label: 'Energía Autoconsumida (kWh)',
         backgroundColor: 'rgba(75, 192, 192, 0.2)',
         borderColor: 'rgba(75, 192, 192, 1)',
         fill: false,
-        data: sortedDayData.map(item => parseFloat(item.energiaAutoconsumida_kWh.replace(',', '.'))),
+        data: sortedDayData.map(item => parseNumber(item?.energiaAutoconsumida_kWh)),
       },
     ],
   };

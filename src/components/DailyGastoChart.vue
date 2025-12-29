@@ -59,7 +59,10 @@ const props = defineProps({
 });
 
 const dailyGastoSelectedDay = ref<string | null>(null); // Estado local para sincronizar con el BehaviorSubject
-const days = computed(() => [...new Set((props.data as DataItem[]).map((item: DataItem) => item.fecha))]);
+const days = computed(() => {
+  if (!props.data || !Array.isArray(props.data)) return [];
+  return [...new Set((props.data as DataItem[]).filter(item => item?.fecha).map((item: DataItem) => item.fecha))];
+});
 
 // Suscripción al estado compartido
 let subscription: Subscription | null = null;
@@ -106,39 +109,47 @@ interface DataItem {
   precio_kwh: number;
 }
 
+const parseNumber = (value: string | undefined): number => {
+  if (!value) return 0;
+  return parseFloat(value.replace(',', '.')) || 0;
+};
+
 const chartData = computed(() => {
-  const dayData = (props.data as DataItem[]).filter((item: DataItem) => item.fecha === dailyGastoSelectedDay.value);
-  const sortedDayData = dayData.sort((a, b) => a.hora.localeCompare(b.hora));
+  if (!props.data || !Array.isArray(props.data)) {
+    return { labels: [], datasets: [] };
+  }
+
+  const dayData = (props.data as DataItem[]).filter((item: DataItem) => item?.fecha === dailyGastoSelectedDay.value);
+  const sortedDayData = dayData.sort((a, b) => (a?.hora || '').localeCompare(b?.hora || ''));
 
   return {
-    labels: sortedDayData.map(item => item.hora),
+    labels: sortedDayData.map(item => item?.hora || ''),
     datasets: [
       {
         label: 'Gasto Total (€)',
         backgroundColor: chartColors.value.backgroundColor,
         borderColor: chartColors.value.borderColor,
         fill: false,
-        data: sortedDayData.map(item => item.gasto_total),
-        metodo: sortedDayData.map(item => item.metodoObtencion),
-        precioKwh: sortedDayData.map(item => item.precio_kwh),
-        yAxisID: 'y-left', // Asocia esta línea al eje Y izquierdo
+        data: sortedDayData.map(item => item?.gasto_total || 0),
+        metodo: sortedDayData.map(item => item?.metodoObtencion || ''),
+        precioKwh: sortedDayData.map(item => item?.precio_kwh || 0),
+        yAxisID: 'y-left',
       },{
         label: 'Precio por kWh (€)',
         backgroundColor: '#4caf50',
         borderColor: '#4caf50',
         fill: false,
-        data: sortedDayData.map(item => item.precio_kwh),
-        yAxisID: 'y-left', // Asocia esta línea al eje Y izquierdo
+        data: sortedDayData.map(item => item?.precio_kwh || 0),
+        yAxisID: 'y-left',
       },
       {
         label: 'Consumo (kWh)',
         backgroundColor: '#ff9800',
         borderColor: '#ff9800',
         fill: false,
-        data: sortedDayData.map(item => parseFloat(item.consumo_kWh.replace(',', '.'))),
-        yAxisID: 'y-right', // Asocia esta línea al eje Y derecho
+        data: sortedDayData.map(item => parseNumber(item?.consumo_kWh)),
+        yAxisID: 'y-right',
       },
-      
     ],
   };
 });

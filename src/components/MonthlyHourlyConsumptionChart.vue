@@ -59,7 +59,10 @@ const props = defineProps({
 });
 
 const monthlyHourlySelectedMonth = ref<string | null>(null); // Estado local para sincronizar con el BehaviorSubject
-const months = computed(() => [...new Set((props.data as DataItem[]).map((item: DataItem) => item.fecha.slice(0, 7)))]);
+const months = computed(() => {
+  if (!props.data || !Array.isArray(props.data)) return [];
+  return [...new Set((props.data as DataItem[]).filter(item => item?.fecha).map((item: DataItem) => item.fecha.slice(0, 7)))];
+});
 
 // Suscripción al estado compartido
 let subscription: Subscription | null = null;
@@ -106,9 +109,19 @@ interface DataItem {
   energiaAutoconsumida_kWh: string;
 }
 
+const parseNumber = (value: string | undefined): number => {
+  if (!value) return 0;
+  return parseFloat(value.replace(',', '.')) || 0;
+};
+
 const chartData = computed(() => {
-  const monthData = (props.data as DataItem[]).filter((item: DataItem) => item.fecha.slice(0, 7) === monthlyHourlySelectedMonth.value);
+  if (!props.data || !Array.isArray(props.data)) {
+    return { labels: [], datasets: [] };
+  }
+
+  const monthData = (props.data as DataItem[]).filter((item: DataItem) => item?.fecha?.slice(0, 7) === monthlyHourlySelectedMonth.value);
   const groupedData = monthData.reduce((acc, item) => {
+    if (!item?.hora) return acc;
     const hour = item.hora;
     if (!acc[hour]) {
       acc[hour] = {
@@ -118,10 +131,10 @@ const chartData = computed(() => {
         energiaAutoconsumida: 0,
       };
     }
-    acc[hour].consumo += parseFloat(item.consumo_kWh.replace(',', '.'));
-    acc[hour].energiaVertida += parseFloat(item.energiaVertida_kWh.replace(',', '.'));
-    acc[hour].energiaGenerada += parseFloat(item.energiaGenerada_kWh.replace(',', '.'));
-    acc[hour].energiaAutoconsumida += parseFloat(item.energiaAutoconsumida_kWh.replace(',', '.'));
+    acc[hour].consumo += parseNumber(item.consumo_kWh);
+    acc[hour].energiaVertida += parseNumber(item.energiaVertida_kWh);
+    acc[hour].energiaGenerada += parseNumber(item.energiaGenerada_kWh);
+    acc[hour].energiaAutoconsumida += parseNumber(item.energiaAutoconsumida_kWh);
     return acc;
   }, {} as Record<string, { consumo: number; energiaVertida: number; energiaGenerada: number; energiaAutoconsumida: number }>);
 

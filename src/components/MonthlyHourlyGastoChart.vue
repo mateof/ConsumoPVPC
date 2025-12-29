@@ -59,7 +59,10 @@ const props = defineProps({
 });
 
 const monthlyHourlyGastoSelectedMonth = ref<string | null>(null); // Estado local para sincronizar con el BehaviorSubject
-const months = computed(() => [...new Set((props.data as DataItem[]).map((item: DataItem) => item.fecha.slice(0, 7)))]);
+const months = computed(() => {
+  if (!props.data || !Array.isArray(props.data)) return [];
+  return [...new Set((props.data as DataItem[]).filter(item => item?.fecha).map((item: DataItem) => item.fecha.slice(0, 7)))];
+});
 
 // Suscripción al estado compartido
 let subscription: Subscription | null = null;
@@ -104,23 +107,34 @@ interface DataItem {
   consumo_kWh: string;
 }
 
+const parseNumber = (value: string | undefined): number => {
+  if (!value) return 0;
+  return parseFloat(value.replace(',', '.')) || 0;
+};
+
 const chartData = computed(() => {
-  const monthData = (props.data as DataItem[]).filter((item: DataItem) => item.fecha.slice(0, 7) === monthlyHourlyGastoSelectedMonth.value);
+  if (!props.data || !Array.isArray(props.data)) {
+    return { labels: [], datasets: [] };
+  }
+
+  const monthData = (props.data as DataItem[]).filter((item: DataItem) => item?.fecha?.slice(0, 7) === monthlyHourlyGastoSelectedMonth.value);
   const groupedGasto = monthData.reduce((acc, item) => {
+    if (!item?.hora) return acc;
     const hour = item.hora;
     if (!acc[hour]) {
       acc[hour] = 0;
     }
-    acc[hour] += item.gasto_total;
+    acc[hour] += item?.gasto_total || 0;
     return acc;
   }, {} as Record<string, number>);
 
   const groupedConsumo = monthData.reduce((acc, item) => {
+    if (!item?.hora) return acc;
     const hour = item.hora;
     if (!acc[hour]) {
       acc[hour] = 0;
     }
-    acc[hour] += parseFloat(item.consumo_kWh.replace(',', '.'));
+    acc[hour] += parseNumber(item.consumo_kWh);
     return acc;
   }, {} as Record<string, number>);
 
