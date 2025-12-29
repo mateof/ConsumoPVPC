@@ -19,9 +19,20 @@ import '@mdi/font/css/materialdesignicons.css';
 const myCustomLightTheme: ThemeDefinition = {
   dark: false,
   colors: {
-    primary: '#33627f',
-    secondary: '#34997e',
-    black: '#0f172a',
+    primary: '#2563eb',
+    'primary-darken-1': '#1d4ed8',
+    secondary: '#10b981',
+    'secondary-darken-1': '#059669',
+    accent: '#8b5cf6',
+    error: '#ef4444',
+    warning: '#f59e0b',
+    info: '#3b82f6',
+    success: '#22c55e',
+    background: '#f8fafc',
+    surface: '#ffffff',
+    'surface-variant': '#f1f5f9',
+    'on-surface': '#1e293b',
+    'on-background': '#0f172a',
   },
 };
 
@@ -32,6 +43,23 @@ const vuetify = createVuetify({
     defaultTheme: 'myCustomLightTheme',
     themes: {
       myCustomLightTheme,
+    },
+  },
+  defaults: {
+    VCard: {
+      elevation: 0,
+      rounded: 'lg',
+    },
+    VBtn: {
+      rounded: 'lg',
+    },
+    VTextField: {
+      variant: 'outlined',
+      density: 'comfortable',
+    },
+    VSelect: {
+      variant: 'outlined',
+      density: 'comfortable',
     },
   },
 });

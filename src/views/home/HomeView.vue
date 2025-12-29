@@ -85,30 +85,68 @@ const handleFooterAction = () => {
 
 <style scoped>
 .calculo-gasto-container {
-  margin-top: 24px;
-  padding: 16px; /* Padding por defecto */
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  background-color: #f9f9f9;
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border: 1px solid rgba(37, 99, 235, 0.1);
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(37, 99, 235, 0.08);
+  position: relative;
+  overflow: hidden;
+}
+
+.calculo-gasto-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #2563eb 0%, #10b981 100%);
 }
 
 .calculo-gasto-title {
-  margin-bottom: 16px;
+  margin-bottom: 1.5rem;
   font-size: 1.5rem;
-  font-weight: bold;
-  color: #333;
+  font-weight: 700;
+  color: #1e293b;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  letter-spacing: -0.5px;
 }
 
-/* Aplica padding del 2% en pantallas que no sean móviles */
+.calculo-gasto-title::before {
+  content: '\F0175';
+  font-family: 'Material Design Icons';
+  color: #2563eb;
+  font-size: 1.75rem;
+}
+
 @media (min-width: 600px) {
   .calculo-gasto-container {
     margin-left: 2%;
     margin-right: 2%;
+    padding: 2rem;
   }
+}
 
-  .vcard-gasto {
-    margin-left: 5%;
-    margin-right: 5%;
+@media (min-width: 1024px) {
+  .calculo-gasto-container {
+    margin-left: 4%;
+    margin-right: 4%;
+  }
+}
+
+:deep(.vcard-gasto) {
+  margin-left: 2%;
+  margin-right: 2%;
+}
+
+@media (min-width: 768px) {
+  :deep(.vcard-gasto) {
+    margin-left: 4%;
+    margin-right: 4%;
   }
 }
 </style>
