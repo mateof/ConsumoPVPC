@@ -51,7 +51,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { fetchPVPCData } from '../services/Esios';
 import { PvpcDataHelper } from '../models/PvpcData';
 import { getPvpcData } from '../services/DatabaseService';
