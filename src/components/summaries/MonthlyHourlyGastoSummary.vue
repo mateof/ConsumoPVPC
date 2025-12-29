@@ -49,7 +49,10 @@ const props = defineProps({
 
 // Estado local para el mes seleccionado
 const selectedMonth = ref<string | null>(null);
-const months = computed(() => [...new Set((props.data as DataItem[]).map((item: DataItem) => item.fecha.slice(0, 7)))]);
+const months = computed(() => {
+  if (!props.data || !Array.isArray(props.data)) return [];
+  return [...new Set((props.data as DataItem[]).filter(item => item?.fecha).map((item: DataItem) => item.fecha.slice(0, 7)))];
+});
 
 // Suscripción al estado compartido
 let subscription: Subscription | null = null;
@@ -70,9 +73,9 @@ onUnmounted(() => {
 
 // Filtra los datos del mes seleccionado
 const filteredData = computed(() => {
-  if (!selectedMonth.value) return [];
+  if (!selectedMonth.value || !props.data || !Array.isArray(props.data)) return [];
   return (props.data as DataItem[]).filter(
-    (item: DataItem) => item.fecha.slice(0, 7) === selectedMonth.value
+    (item: DataItem) => item?.fecha?.slice(0, 7) === selectedMonth.value
   );
 });
 

@@ -49,7 +49,10 @@ const props = defineProps({
 
 // Estado local para el día seleccionado
 const selectedDay = ref<string | null>(null);
-const days = computed(() => [...new Set((props.data as DataItem[]).map((item: DataItem) => item.fecha))]);
+const days = computed(() => {
+  if (!props.data || !Array.isArray(props.data)) return [];
+  return [...new Set((props.data as DataItem[]).filter(item => item?.fecha).map((item: DataItem) => item.fecha))];
+});
 
 // Suscripción al estado compartido
 let subscription: Subscription | null = null;
@@ -70,9 +73,9 @@ onUnmounted(() => {
 
 // Filtra los datos del día seleccionado
 const filteredData = computed(() => {
-  if (!selectedDay.value) return [];
+  if (!selectedDay.value || !props.data || !Array.isArray(props.data)) return [];
   return (props.data as DataItem[]).filter(
-    (item: DataItem) => item.fecha === selectedDay.value
+    (item: DataItem) => item?.fecha === selectedDay.value
   );
 });
 
