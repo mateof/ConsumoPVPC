@@ -237,7 +237,7 @@ const updateRegion = () => {
 };
 
 // Handler cuando se selecciona fecha de inicio
-const onStartDateSelected = (dateValue: Date) => {
+const onStartDateSelected = (dateValue: Date | null) => {
   if (!dateValue) return;
 
   const isoString = dateToISOString(dateValue);
@@ -256,7 +256,7 @@ const onStartDateSelected = (dateValue: Date) => {
 };
 
 // Handler cuando se selecciona fecha de fin
-const onEndDateSelected = (dateValue: Date) => {
+const onEndDateSelected = (dateValue: Date | null) => {
   if (!dateValue) return;
 
   const isoString = dateToISOString(dateValue);
