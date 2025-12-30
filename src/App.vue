@@ -53,12 +53,19 @@ onUnmounted(() => {
 
 <style scoped>
 .app-background {
-  background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
   min-height: 100vh;
 }
 
 .loading-overlay {
   backdrop-filter: blur(4px);
+}
+
+.loading-overlay :deep(.v-overlay__content) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
 }
 
 .loading-content {
@@ -67,15 +74,15 @@ onUnmounted(() => {
   align-items: center;
   gap: 1.5rem;
   padding: 2rem;
-  background: rgba(255, 255, 255, 0.95);
+  background: rgba(var(--v-theme-surface), 0.95);
   border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
 }
 
 .loading-text {
   font-size: 1.1rem;
   font-weight: 500;
-  color: #33627f;
+  color: rgb(var(--v-theme-primary));
   letter-spacing: 0.5px;
 }
 

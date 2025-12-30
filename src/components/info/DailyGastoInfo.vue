@@ -32,23 +32,19 @@ export default {
 </script>
 
 <style scoped>
-/* Estilo para las filas con fondo claro */
 .row-light {
-  background-color: #f9f9f9; /* Color de fondo claro */
+  background: rgba(var(--v-theme-surface-variant), 0.3);
 }
 
-/* Estilo para las filas con fondo oscuro */
 .row-dark {
-  background-color: #eaeaea; /* Color de fondo ligeramente más oscuro */
+  background: rgba(var(--v-theme-surface-variant), 0.6);
 }
 
-/* Estilo general para las filas */
 tr {
-  transition: background-color 0.3s ease; /* Transición suave al pasar el ratón */
+  transition: background-color 0.3s ease;
 }
 
-/* Efecto hover para las filas */
 tr:hover {
-  background-color: #dcdcdc; /* Color de fondo al pasar el ratón */
+  background: rgba(var(--v-theme-primary), 0.1);
 }
 </style>

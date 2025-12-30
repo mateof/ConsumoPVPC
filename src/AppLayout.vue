@@ -72,16 +72,16 @@ const selectedColor = ref('#ffffff');
     left: 24px;
     width: 48px;
     height: 48px;
-    background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+    background: linear-gradient(135deg, rgb(var(--v-theme-accent)) 0%, rgb(var(--v-theme-primary)) 100%);
     color: white;
-    box-shadow: 0 4px 14px rgba(139, 92, 246, 0.4);
+    box-shadow: 0 4px 14px rgba(var(--v-theme-accent), 0.4);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    z-index: 1000;
+    z-index: 100;
 }
 
 .color-fab:hover {
     transform: translateY(-3px) scale(1.05);
-    box-shadow: 0 8px 20px rgba(139, 92, 246, 0.5);
+    box-shadow: 0 8px 20px rgba(var(--v-theme-accent), 0.5);
 }
 
 .color-dialog {
@@ -93,9 +93,9 @@ const selectedColor = ref('#ffffff');
     display: flex;
     align-items: center;
     font-weight: 600;
-    color: #1e293b;
-    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    color: rgb(var(--v-theme-on-surface));
+    background: rgba(var(--v-theme-surface-variant), 0.5);
+    border-bottom: 1px solid rgba(var(--v-theme-on-surface), 0.06);
 }
 
 .dialog-content {
@@ -104,8 +104,8 @@ const selectedColor = ref('#ffffff');
 
 .dialog-actions {
     padding: 0.75rem 1rem;
-    background: #fafbfc;
-    border-top: 1px solid rgba(0, 0, 0, 0.04);
+    background: rgba(var(--v-theme-surface-variant), 0.3);
+    border-top: 1px solid rgba(var(--v-theme-on-surface), 0.04);
 }
 
 @media (max-width: 600px) {

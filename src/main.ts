@@ -36,13 +36,41 @@ const myCustomLightTheme: ThemeDefinition = {
   },
 };
 
+const myCustomDarkTheme: ThemeDefinition = {
+  dark: true,
+  colors: {
+    primary: '#3b82f6',
+    'primary-darken-1': '#2563eb',
+    secondary: '#10b981',
+    'secondary-darken-1': '#059669',
+    accent: '#a78bfa',
+    error: '#f87171',
+    warning: '#fbbf24',
+    info: '#60a5fa',
+    success: '#34d399',
+    background: '#0f172a',
+    surface: '#1e293b',
+    'surface-variant': '#334155',
+    'on-surface': '#f1f5f9',
+    'on-background': '#f8fafc',
+  },
+};
+
+// Read saved theme from localStorage
+const THEME_STORAGE_KEY = 'consumo-pvpc-theme';
+const savedTheme = localStorage.getItem(THEME_STORAGE_KEY);
+const initialTheme = (savedTheme === 'myCustomLightTheme' || savedTheme === 'myCustomDarkTheme')
+  ? savedTheme
+  : 'myCustomLightTheme';
+
 const vuetify = createVuetify({
   components,
   directives,
   theme: {
-    defaultTheme: 'myCustomLightTheme',
+    defaultTheme: initialTheme,
     themes: {
       myCustomLightTheme,
+      myCustomDarkTheme,
     },
   },
   defaults: {

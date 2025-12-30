@@ -67,18 +67,19 @@ const importJson = ($event: Event) => {
 
 <style scoped>
 .importer-card {
-  background: #ffffff;
+  background: rgb(var(--v-theme-surface));
   border-radius: 16px;
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(var(--v-theme-on-surface), 0.06);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.03);
   margin-bottom: 1.5rem;
   overflow: hidden;
+  transition: background-color 0.3s ease;
 }
 
 .importer-header {
   padding: 1.25rem 1.5rem;
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  background: rgba(var(--v-theme-surface-variant), 0.5);
+  border-bottom: 1px solid rgba(var(--v-theme-on-surface), 0.06);
 }
 
 .header-info {
@@ -88,20 +89,20 @@ const importJson = ($event: Event) => {
 }
 
 .header-icon {
-  color: #2563eb;
+  color: rgb(var(--v-theme-primary));
 }
 
 .header-title {
   font-size: 1.1rem;
   font-weight: 600;
-  color: #1e293b;
+  color: rgb(var(--v-theme-on-surface));
   margin: 0;
   letter-spacing: -0.25px;
 }
 
 .header-subtitle {
   font-size: 0.875rem;
-  color: #64748b;
+  color: rgba(var(--v-theme-on-surface), 0.6);
   margin: 0.25rem 0 0 0;
 }
 
@@ -110,7 +111,7 @@ const importJson = ($event: Event) => {
 }
 
 .file-input-modern {
-  background: #f8fafc;
+  background: rgba(var(--v-theme-surface-variant), 0.3);
   border-radius: 10px;
 }
 

@@ -87,12 +87,13 @@ const handleFooterAction = () => {
 .calculo-gasto-container {
   margin-top: 2rem;
   padding: 1.5rem;
-  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-  border: 1px solid rgba(37, 99, 235, 0.1);
+  background: rgb(var(--v-theme-surface));
+  border: 1px solid rgba(var(--v-theme-primary), 0.1);
   border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(37, 99, 235, 0.08);
+  box-shadow: 0 4px 20px rgba(var(--v-theme-primary), 0.08);
   position: relative;
   overflow: hidden;
+  transition: background-color 0.3s ease;
 }
 
 .calculo-gasto-container::before {
@@ -102,14 +103,14 @@ const handleFooterAction = () => {
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(90deg, #2563eb 0%, #10b981 100%);
+  background: linear-gradient(90deg, rgb(var(--v-theme-primary)) 0%, rgb(var(--v-theme-secondary)) 100%);
 }
 
 .calculo-gasto-title {
   margin-bottom: 1.5rem;
   font-size: 1.5rem;
   font-weight: 700;
-  color: #1e293b;
+  color: rgb(var(--v-theme-on-surface));
   display: flex;
   align-items: center;
   gap: 0.75rem;
@@ -119,7 +120,7 @@ const handleFooterAction = () => {
 .calculo-gasto-title::before {
   content: '\F0175';
   font-family: 'Material Design Icons';
-  color: #2563eb;
+  color: rgb(var(--v-theme-primary));
   font-size: 1.75rem;
 }
 

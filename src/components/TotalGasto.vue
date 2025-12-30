@@ -144,13 +144,8 @@ const precioMinimo = computed(() => {
   position: relative;
 }
 
-/* .vcard {
-  width: 100%;
-} */
-
 .header {
-  background-color: #f5f5f5;
-  /* Fondo gris claro */
+  background: rgba(var(--v-theme-surface-variant), 0.5);
 }
 
 .card-body {

@@ -54,8 +54,7 @@
 
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue';
-import { VBtn, VIcon, VContainer, VRow, VCol, VToolbar, VToolbarTitle, VSpacer } from 'vuetify/components';
-import { VDataTable } from 'vuetify/labs/components';
+import { VBtn, VIcon, VContainer, VRow, VCol, VToolbar, VToolbarTitle, VSpacer, VDataTable } from 'vuetify/components';
 import { getAllPvpcData, clearPvpcData, deletePvpcDataByDate } from '@/services/DatabaseService';
 import type { PvpcData } from '@/services/DatabaseService';
 

@@ -1,14 +1,17 @@
 $background: #202020;
 
+// Unified card widths - both v-card and importer-card have same margins
 @media (min-width: 1024px) {
-    .v-card {
+    .v-card,
+    .importer-card {
         margin-left: 8%;
         margin-right: 8%;
     }
 }
 
 @media (max-width: 1024px) {
-    .v-card {
+    .v-card,
+    .importer-card {
         margin-left: 2%;
         margin-right: 2%;
     }
